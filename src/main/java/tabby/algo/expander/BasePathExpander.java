@@ -1,4 +1,4 @@
-package tabby.algo;
+package tabby.algo.expander;
 
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.impl.ExtendedPath;
@@ -22,16 +22,16 @@ import static org.neo4j.internal.helpers.collection.ResourceClosingIterator.newR
  * @author wh1t3p1g
  * @since 2022/1/5
  */
-public abstract class AllSimplePathsExpander implements PathExpander {
+public abstract class BasePathExpander implements PathExpander {
 
 
     abstract static class StandardExpansion<T> implements ResourceIterable<T>
     {
-        final AllSimplePathsExpander expander;
+        final BasePathExpander expander;
         final Path path;
         final BranchState state;
 
-        StandardExpansion( AllSimplePathsExpander expander, Path path, BranchState state )
+        StandardExpansion(BasePathExpander expander, Path path, BranchState state )
         {
             this.expander = expander;
             this.path = path;
@@ -43,7 +43,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
             return "Expansion[" + path + ".expand( " + expander + " )." + nodesORrelationships + "()]";
         }
 
-        abstract StandardExpansion<T> createNew(AllSimplePathsExpander expander );
+        abstract StandardExpansion<T> createNew(BasePathExpander expander );
 
         public StandardExpansion<T> including(RelationshipType type )
         {
@@ -94,7 +94,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
     private static final class RelationshipExpansion extends
             StandardExpansion<Relationship>
     {
-        RelationshipExpansion( AllSimplePathsExpander expander, Path path, BranchState state )
+        RelationshipExpansion(BasePathExpander expander, Path path, BranchState state )
         {
             super( expander, path, state );
         }
@@ -106,7 +106,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        StandardExpansion<Relationship> createNew(AllSimplePathsExpander expander )
+        StandardExpansion<Relationship> createNew(BasePathExpander expander )
         {
             return new RelationshipExpansion( expander, path, state );
         }
@@ -126,7 +126,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
 
     private static final class NodeExpansion extends StandardExpansion<Node>
     {
-        NodeExpansion( AllSimplePathsExpander expander, Path path, BranchState state )
+        NodeExpansion(BasePathExpander expander, Path path, BranchState state )
         {
             super( expander, path, state );
         }
@@ -138,7 +138,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        StandardExpansion<Node> createNew(AllSimplePathsExpander expander )
+        StandardExpansion<Node> createNew(BasePathExpander expander )
         {
             return new NodeExpansion( expander, path, state );
         }
@@ -165,7 +165,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
     }
 
-    private static class AllExpander extends AllSimplePathsExpander
+    private static class AllExpander extends BasePathExpander
     {
         private final Direction direction;
 
@@ -192,13 +192,13 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander add( RelationshipType type, Direction dir )
+        public BasePathExpander add(RelationshipType type, Direction dir )
         {
             return this;
         }
 
         @Override
-        public AllSimplePathsExpander remove( RelationshipType type )
+        public BasePathExpander remove(RelationshipType type )
         {
             Map<String, Exclusion> exclude = new HashMap<>();
             exclude.put( type.name(), Exclusion.ALL );
@@ -206,13 +206,13 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander reversed()
+        public BasePathExpander reversed()
         {
             return reverse();
         }
 
         @Override
-        public AllSimplePathsExpander reverse()
+        public BasePathExpander reverse()
         {
             return new AllExpander( direction.reverse() );
         }
@@ -303,7 +303,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
     }
 
-    private static final class ExcludingExpander extends AllSimplePathsExpander
+    private static final class ExcludingExpander extends BasePathExpander
     {
         private final Exclusion defaultExclusion;
         private final Map<String, Exclusion> exclusion;
@@ -343,7 +343,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander add( RelationshipType type, Direction direction )
+        public BasePathExpander add(RelationshipType type, Direction direction )
         {
             Exclusion excluded = exclusion.get( type.name() );
             final Map<String, Exclusion> newExclusion;
@@ -376,7 +376,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander remove( RelationshipType type )
+        public BasePathExpander remove(RelationshipType type )
         {
             Exclusion excluded = exclusion.get( type.name() );
             if ( excluded == Exclusion.ALL )
@@ -389,13 +389,13 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander reversed()
+        public BasePathExpander reversed()
         {
             return reverse();
         }
 
         @Override
-        public AllSimplePathsExpander reverse()
+        public BasePathExpander reverse()
         {
             Map<String, Exclusion> newExclusion = new HashMap<>();
             for ( Map.Entry<String, Exclusion> entry : exclusion.entrySet() )
@@ -406,17 +406,17 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
     }
 
-    public static final AllSimplePathsExpander DEFAULT = new AllExpander(
+    public static final BasePathExpander DEFAULT = new AllExpander(
             Direction.BOTH )
     {
         @Override
-        public AllSimplePathsExpander add( RelationshipType type, Direction direction )
+        public BasePathExpander add(RelationshipType type, Direction direction )
         {
             return create( type, direction );
         }
     };
 
-    public static final AllSimplePathsExpander EMPTY =
+    public static final BasePathExpander EMPTY =
             new RegularExpander( Collections.emptyMap() );
 
     public static class DirectionAndTypes
@@ -431,7 +431,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
     }
 
-    static class RegularExpander extends AllSimplePathsExpander
+    static class RegularExpander extends BasePathExpander
     {
         final Map<Direction, RelationshipType[]> typesMap;
         final DirectionAndTypes[] directions;
@@ -475,7 +475,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
             }
         }
 
-        AllSimplePathsExpander createNew( Map<Direction, RelationshipType[]> types )
+        BasePathExpander createNew(Map<Direction, RelationshipType[]> types )
         {
             if ( types.isEmpty() )
             {
@@ -485,7 +485,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander add( RelationshipType type, Direction direction )
+        public BasePathExpander add(RelationshipType type, Direction direction )
         {
             Map<Direction, Collection<RelationshipType>> tempMap = temporaryTypeMapFrom( typesMap );
             tempMap.get( direction ).add( type );
@@ -493,7 +493,7 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander remove( RelationshipType type )
+        public BasePathExpander remove(RelationshipType type )
         {
             Map<Direction, Collection<RelationshipType>> tempMap = temporaryTypeMapFrom( typesMap );
             for ( Direction direction : Direction.values() )
@@ -504,13 +504,13 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander reversed()
+        public BasePathExpander reversed()
         {
             return reverse();
         }
 
         @Override
-        public AllSimplePathsExpander reverse()
+        public BasePathExpander reverse()
         {
             Map<Direction, Collection<RelationshipType>> tempMap = temporaryTypeMapFrom( typesMap );
             Collection<RelationshipType> out = tempMap.get( Direction.OUTGOING );
@@ -521,12 +521,12 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
     }
 
-    private static final class FilteringExpander extends AllSimplePathsExpander
+    private static final class FilteringExpander extends BasePathExpander
     {
-        private final AllSimplePathsExpander expander;
+        private final BasePathExpander expander;
         private final Filter[] filters;
 
-        FilteringExpander( AllSimplePathsExpander expander, Filter... filters )
+        FilteringExpander(BasePathExpander expander, Filter... filters )
         {
             this.expander = expander;
             this.filters = filters;
@@ -563,14 +563,14 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander addNodeFilter( Predicate<? super Node> filter )
+        public BasePathExpander addNodeFilter(Predicate<? super Node> filter )
         {
             return new FilteringExpander( expander, append( filters,
                     new NodeFilter( filter ) ) );
         }
 
         @Override
-        public AllSimplePathsExpander addRelationshipFilter(
+        public BasePathExpander addRelationshipFilter(
                 Predicate<? super Relationship> filter )
         {
             return new FilteringExpander( expander, append( filters,
@@ -578,26 +578,26 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         }
 
         @Override
-        public AllSimplePathsExpander add( RelationshipType type, Direction direction )
+        public BasePathExpander add(RelationshipType type, Direction direction )
         {
             return new FilteringExpander( expander.add( type, direction ),
                     filters );
         }
 
         @Override
-        public AllSimplePathsExpander remove( RelationshipType type )
+        public BasePathExpander remove(RelationshipType type )
         {
             return new FilteringExpander( expander.remove( type ), filters );
         }
 
         @Override
-        public AllSimplePathsExpander reversed()
+        public BasePathExpander reversed()
         {
             return reverse();
         }
 
         @Override
-        public AllSimplePathsExpander reverse()
+        public BasePathExpander reverse()
         {
             return new FilteringExpander( expander.reversed(), filters );
         }
@@ -701,37 +701,37 @@ public abstract class AllSimplePathsExpander implements PathExpander {
 
     abstract void buildString( StringBuilder result );
 
-    public final AllSimplePathsExpander add( RelationshipType type )
+    public final BasePathExpander add(RelationshipType type )
     {
         return add( type, Direction.BOTH );
     }
 
-    public abstract AllSimplePathsExpander add( RelationshipType type,
-                                          Direction direction );
+    public abstract BasePathExpander add(RelationshipType type,
+                                         Direction direction );
 
-    public abstract AllSimplePathsExpander remove( RelationshipType type );
+    public abstract BasePathExpander remove(RelationshipType type );
 
     @Override
-    public abstract AllSimplePathsExpander reverse();
+    public abstract BasePathExpander reverse();
 
-    public abstract AllSimplePathsExpander reversed();
+    public abstract BasePathExpander reversed();
 
-    public AllSimplePathsExpander addNodeFilter( Predicate<? super Node> filter )
+    public BasePathExpander addNodeFilter(Predicate<? super Node> filter )
     {
         return new FilteringExpander( this, new NodeFilter( filter ) );
     }
 
-    public AllSimplePathsExpander addRelationshipFilter( Predicate<? super Relationship> filter )
+    public BasePathExpander addRelationshipFilter(Predicate<? super Relationship> filter )
     {
         return new FilteringExpander( this, new RelationshipFilter( filter ) );
     }
 
-    public static AllSimplePathsExpander create( Direction direction )
+    public static BasePathExpander create(Direction direction )
     {
         return new AllExpander( direction );
     }
 
-    public static AllSimplePathsExpander create( RelationshipType type, Direction dir )
+    public static BasePathExpander create(RelationshipType type, Direction dir )
     {
         Map<Direction, RelationshipType[]> types = new EnumMap<>( Direction.class );
         types.put( dir, new RelationshipType[]{type} );
@@ -785,8 +785,8 @@ public abstract class AllSimplePathsExpander implements PathExpander {
         return map;
     }
 
-    public static AllSimplePathsExpander create( RelationshipType type1, Direction dir1,
-                                           RelationshipType type2, Direction dir2, Object... more )
+    public static BasePathExpander create(RelationshipType type1, Direction dir1,
+                                          RelationshipType type2, Direction dir2, Object... more )
     {
         Map<Direction, Collection<RelationshipType>> tempMap = temporaryTypeMap();
         tempMap.get( dir1 ).add( type1 );

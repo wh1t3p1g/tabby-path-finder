@@ -1,4 +1,4 @@
-package tabby.algo;
+package tabby.algo.expander;
 
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.traversal.BranchState;
@@ -16,9 +16,9 @@ import static org.neo4j.internal.helpers.collection.Iterators.asResourceIterator
  * @author wh1t3p1g
  * @since 2022/1/5
  */
-public class TabbyPathExpander extends AllSimplePathsExpander.RegularExpander {
+public class SimplePathExpander extends BasePathExpander.RegularExpander {
 
-    TabbyPathExpander(Map<Direction, RelationshipType[]> types) {
+    SimplePathExpander(Map<Direction, RelationshipType[]> types) {
         super(types);
     }
 
@@ -54,11 +54,11 @@ public class TabbyPathExpander extends AllSimplePathsExpander.RegularExpander {
     }
 
     @Override
-    AllSimplePathsExpander createNew(Map<Direction, RelationshipType[]> types) {
+    BasePathExpander createNew(Map<Direction, RelationshipType[]> types) {
         if(types == null){
             types = new HashMap<>();
         }
-        return new TabbyPathExpander( types );
+        return new SimplePathExpander( types );
     }
 
     public DirectionAndTypes getDirectionAndTypes(String typename){
@@ -73,9 +73,9 @@ public class TabbyPathExpander extends AllSimplePathsExpander.RegularExpander {
         return null;
     }
 
-    public static AllSimplePathsExpander newInstance() {
+    public static BasePathExpander newInstance() {
         Map<Direction, RelationshipType[]> types = new HashMap<>();
-        AllSimplePathsExpander tabbyPathExpander = new TabbyPathExpander(types);
+        BasePathExpander tabbyPathExpander = new SimplePathExpander(types);
         for (Pair<RelationshipType, Direction> pair : RelationshipTypeAndDirections
                 .parse("<CALL|ALIAS")) {
             if (pair.other() == null) {

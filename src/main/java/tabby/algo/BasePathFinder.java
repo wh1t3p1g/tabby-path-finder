@@ -16,16 +16,18 @@ import static org.neo4j.graphdb.traversal.Evaluators.toDepth;
  * @author wh1t3p1g
  * @since 2022/1/5
  */
-public class AllSimplePathsFinder extends TraversalPathFinder {
+public class BasePathFinder extends TraversalPathFinder {
 
     private final PathExpander expander;
     private final EvaluationContext context;
     private final int maxDepth;
+    private final boolean depthFirst;
 
-    public AllSimplePathsFinder(EvaluationContext context, PathExpander expander, int maxDepth) {
+    public BasePathFinder(EvaluationContext context, PathExpander expander, int maxDepth, boolean depthFirst) {
         this.expander = expander;
         this.context = context;
         this.maxDepth = maxDepth;
+        this.depthFirst = depthFirst;
     }
 
     protected Uniqueness uniqueness()
@@ -37,9 +39,15 @@ public class AllSimplePathsFinder extends TraversalPathFinder {
     protected Traverser instantiateTraverser(Node start, Node end) {
         Transaction transaction = context.transaction();
         TraversalDescription base = transaction.traversalDescription()
-                                        .depthFirst()
                                         .uniqueness( uniqueness() );
+        if(depthFirst){
+            base = base.depthFirst();
+        }else{
+            base = base.breadthFirst();
+        }
+
         InitialBranchState.State<Object> stack = new InitialBranchState.State<>("", "");
+
         return transaction.bidirectionalTraversalDescription()
                 .startSide( base.expand( expander, stack ).evaluator( toDepth( maxDepth / 2 ) ) )
                 .endSide( base.expand( expander.reverse(), stack.reverse() ).evaluator( toDepth( maxDepth - maxDepth / 2 ) ) )
