@@ -1,45 +1,31 @@
-package tabby.algo;
+package tabby.path;
 
 import org.neo4j.graphalgo.EvaluationContext;
-import org.neo4j.graphalgo.impl.path.TraversalPathFinder;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PathExpander;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.InitialBranchState;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
-import org.neo4j.graphdb.traversal.Uniqueness;
 
 import static org.neo4j.graphdb.traversal.Evaluators.toDepth;
 
 /**
  * @author wh1t3p1g
- * @since 2022/1/5
+ * @since 2022/1/6
  */
-public class BasePathFinder extends TraversalPathFinder {
+public class BidirectionalTraversalPathFinder extends BasePathFinder{
 
-    private final PathExpander expander;
-    private final EvaluationContext context;
-    private final int maxDepth;
-    private final boolean depthFirst;
-
-    public BasePathFinder(EvaluationContext context, PathExpander expander, int maxDepth, boolean depthFirst) {
-        this.expander = expander;
-        this.context = context;
-        this.maxDepth = maxDepth;
-        this.depthFirst = depthFirst;
-    }
-
-    protected Uniqueness uniqueness()
-    {
-        return Uniqueness.NODE_PATH;
+    public BidirectionalTraversalPathFinder(EvaluationContext context, PathExpander expander, int maxDepth, boolean depthFirst) {
+        super(context, expander, maxDepth, depthFirst);
     }
 
     @Override
     protected Traverser instantiateTraverser(Node start, Node end) {
         Transaction transaction = context.transaction();
         TraversalDescription base = transaction.traversalDescription()
-                                        .uniqueness( uniqueness() );
+                .uniqueness( uniqueness() );
+
         if(depthFirst){
             base = base.depthFirst();
         }else{
@@ -53,5 +39,4 @@ public class BasePathFinder extends TraversalPathFinder {
                 .endSide( base.expand( expander.reverse(), stack.reverse() ).evaluator( toDepth( maxDepth - maxDepth / 2 ) ) )
                 .traverse( start, end );
     }
-
 }

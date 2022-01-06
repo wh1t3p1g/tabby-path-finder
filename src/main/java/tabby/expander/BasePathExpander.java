@@ -1,4 +1,4 @@
-package tabby.algo.expander;
+package tabby.expander;
 
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.impl.ExtendedPath;
@@ -24,6 +24,13 @@ import static org.neo4j.internal.helpers.collection.ResourceClosingIterator.newR
  */
 public abstract class BasePathExpander implements PathExpander {
 
+    /**
+     * 调用顺序
+     * order 1 or -1
+     * order 1 正序 sink <-[]- source
+     * order -1 倒序 source -[]-> sink  此时需要考虑propagated的传播性
+     */
+    public int order = 1;
 
     abstract static class StandardExpansion<T> implements ResourceIterable<T>
     {

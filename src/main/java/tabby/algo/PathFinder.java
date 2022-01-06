@@ -9,7 +9,8 @@ import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
-import tabby.algo.expander.SimplePathExpander;
+import tabby.expander.BidirectionalPathExpander;
+import tabby.path.BidirectionalTraversalPathFinder;
 import tabby.result.PathResult;
 
 import java.util.stream.Stream;
@@ -46,9 +47,9 @@ public class PathFinder {
             @Name("maxNodes") long maxNodes,
             @Name("depthFirst") boolean depthFirst) {
 
-        org.neo4j.graphalgo.PathFinder<Path> algo = new BasePathFinder(
+        org.neo4j.graphalgo.PathFinder<Path> algo = new BidirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                SimplePathExpander.newInstance(),
+                BidirectionalPathExpander.newInstance(),
                 (int) maxNodes,
                 depthFirst
         );
