@@ -57,3 +57,5 @@ cql.txt
 config/settings.properties
 
 .DS_Store
+
+target/

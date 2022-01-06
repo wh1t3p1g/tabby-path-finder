@@ -9,8 +9,6 @@
     <version>0.1-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
         <neo4j.version>4.3.8</neo4j.version>
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
 <!--        <neo4j-java-driver.version>4.4.0</neo4j-java-driver.version>-->
