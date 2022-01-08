@@ -7,6 +7,7 @@ import org.neo4j.internal.helpers.collection.ArrayIterator;
 import org.neo4j.internal.helpers.collection.FilteringIterator;
 import org.neo4j.internal.helpers.collection.MappingResourceIterator;
 import org.neo4j.internal.helpers.collection.NestingResourceIterator;
+import tabby.util.Types;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -489,6 +490,18 @@ public abstract class BasePathExpander implements PathExpander {
                 return new AllExpander( Direction.BOTH );
             }
             return new RegularExpander( types );
+        }
+
+        public DirectionAndTypes getDirectionAndTypes(String typename){
+            RelationshipType t = Types.relationshipTypeFor(typename);
+            for(DirectionAndTypes dt:directions){
+                for(RelationshipType type:dt.types){
+                    if(t != null && t.equals(type)){
+                        return dt;
+                    }
+                }
+            }
+            return null;
         }
 
         @Override
