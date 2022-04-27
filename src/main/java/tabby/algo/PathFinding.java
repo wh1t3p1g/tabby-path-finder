@@ -31,7 +31,7 @@ public class PathFinding {
 
     @Procedure
     @Description("tabby.algo.allPaths(sink, source, 5) YIELD path, " +
-            "weight - run allPaths with maxNodes and depthFirst, depthFirst")
+            "weight - run allPaths with maxNodes")
     public Stream<PathResult> allPaths(
             @Name("sinkNode") Node startNode,
             @Name("sourceNode") Node endNode,
@@ -49,8 +49,8 @@ public class PathFinding {
     }
 
     @Procedure
-    @Description("tabby.algo.allPaths(sink, source, 5) YIELD path, " +
-            "weight - run allPaths with maxNodes and depthFirst, depthFirst")
+    @Description("tabby.algo.allPaths(sink, source, 5, \"[-1,0]\") YIELD path, " +
+            "weight - run allPaths with maxNodes and state")
     public Stream<PathResult> allPathsWithState(
             @Name("sinkNode") Node startNode,
             @Name("sourceNode") Node endNode,

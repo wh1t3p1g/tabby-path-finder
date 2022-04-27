@@ -13,7 +13,18 @@ mvn clean package -DskipTests
 
 在neo4j的plugin目录添加jar文件
 
+neo4j server需要在配置中添加上以下内容
+```
+dbms.security.procedures.unrestricted=apoc.*,tabby.*
+dbms.security.procedures.allowlist=apoc.*,gds.*,tabby.*
+```
+
 ## #2 语法
+
+help
+```
+call tabby.help("all")
+```
 
 根据内置的sink污点信息进行路径检索
 ```
