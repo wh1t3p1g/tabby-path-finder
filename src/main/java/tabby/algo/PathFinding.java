@@ -30,9 +30,9 @@ public class PathFinding {
     public Transaction tx;
 
     @Procedure
-    @Description("tabby.algo.allPaths(sink, source, 5) YIELD path, " +
-            "weight - run allPaths with maxNodes")
-    public Stream<PathResult> allPaths(
+    @Description("tabby.algo.allSimplePaths(sink, source, 5) YIELD path, " +
+            "weight - run allSimplePaths with maxNodes")
+    public Stream<PathResult> allSimplePaths(
             @Name("sinkNode") Node startNode,
             @Name("sourceNode") Node endNode,
             @Name("maxNodes") long maxNodes) {
@@ -49,9 +49,9 @@ public class PathFinding {
     }
 
     @Procedure
-    @Description("tabby.algo.allPaths(sink, source, 5, \"[-1,0]\") YIELD path, " +
-            "weight - run allPaths with maxNodes and state")
-    public Stream<PathResult> allPathsWithState(
+    @Description("tabby.algo.allSimplePathsWithState(sink, source, 5, \"[-1,0]\") YIELD path, " +
+            "weight - run allSimplePathsWithState with maxNodes and state")
+    public Stream<PathResult> allSimplePathsWithState(
             @Name("sinkNode") Node startNode,
             @Name("sourceNode") Node endNode,
             @Name("maxNodes") long maxNodes,
