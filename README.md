@@ -1,6 +1,6 @@
 # tabby-path-finder
 ## #0 简介
-A neo4j procedure for tabby
+A neo4j procedure for [tabby](https://github.com/wh1t3p1g/tabby)
 
 tabby污点分析扩展，用于根据tabby生成的代码属性图做动态剪枝+深度搜索符合条件的利用链/漏洞链路。
 
