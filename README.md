@@ -31,7 +31,7 @@ call tabby.help("all")
 // templates
 match (source:Method {NAME:"readObject"})
 match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.allPaths(sink, source, 8) yield path
+call tabby.algo.allSimplePaths(sink, source, 8) yield path
 return path limit 1
 ```
 
@@ -40,7 +40,7 @@ return path limit 1
 // templates
 match (source:Method {NAME:"readObject"})
 match (sink:Method {NAME:"invoke"})
-call tabby.algo.allPathsWithState(sink, source, 8, "[-1,0]") yield path
+call tabby.algo.allSimplePathsWithState(sink, source, 8, "[-1,0]") yield path
 return path limit 1
 ```
 
