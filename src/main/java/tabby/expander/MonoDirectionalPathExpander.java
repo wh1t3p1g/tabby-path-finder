@@ -52,7 +52,7 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
             }else{
                 String polluted = (String) next.getProperty("POLLUTED_POSITION", "[]");
                 int[] nextPos = preState.test(current, polluted);
-                if(nextPos != null){
+                if(nextPos != null && nextPos.length > 0){
                     nextState.put(nextId, nextPos);
                     nextRelationships.add(next);
                 }

@@ -40,7 +40,28 @@ public class PathFinding {
         PathFinder<Path> algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
                 new MonoDirectionalPathExpander(),
-                (int) maxNodes
+                (int) maxNodes, null
+        );
+
+        Iterable<Path> allPaths = algo.findAllPaths(startNode, endNode);
+        return StreamSupport.stream(allPaths.spliterator(), true)
+                .map(PathResult::new);
+    }
+
+    @Procedure
+    @Description("tabby.algo.allPaths(sink, source, 5) YIELD path, " +
+            "weight - run allPaths with maxNodes and depthFirst, depthFirst")
+    public Stream<PathResult> allPathsWithState(
+            @Name("sinkNode") Node startNode,
+            @Name("sourceNode") Node endNode,
+            @Name("maxNodes") long maxNodes,
+            @Name("state") String state) {
+
+        PathFinder<Path> algo = new MonoDirectionalTraversalPathFinder(
+                new BasicEvaluationContext(tx, db),
+                new MonoDirectionalPathExpander(),
+                (int) maxNodes,
+                state
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNode);

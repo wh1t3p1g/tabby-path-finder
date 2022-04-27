@@ -58,6 +58,8 @@ public class State {
                 int[] call = callPos[pos];
                 if(call.length == 1 && call[0] == -3) return null;
                 newPolluted.addAll(Arrays.stream(call).boxed().collect(Collectors.toSet()));
+            }else{// 超出数组长度
+                return null;
             }
         }
         return newPolluted.stream().mapToInt(Integer::intValue).toArray();
@@ -71,6 +73,8 @@ public class State {
                 int call = callPos[pos];
                 if(call == -3) return null;
                 newPolluted.add(call);
+            }else{ // 超出数组长度
+                return null;
             }
         }
         return newPolluted.stream().mapToInt(Integer::intValue).toArray();

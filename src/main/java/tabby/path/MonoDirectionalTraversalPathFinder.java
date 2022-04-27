@@ -20,17 +20,24 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
 
     public MonoDirectionalTraversalPathFinder(EvaluationContext context,
                                               PathExpander expander,
-                                              int maxDepth
+                                              int maxDepth,
+                                              String state
     ) {
         super(context, expander, maxDepth, true);
-
+        if(state != null){
+            init(state);
+        }
     }
 
     @Override
     protected Traverser instantiateTraverser(Node start, Node end) {
         Transaction transaction = context.transaction();
-        String position = (String) start.getProperty("POLLUTED_POSITION", "[]");
-        init(position);
+
+        if(initialPositions == null){
+            String position = (String) start.getProperty("POLLUTED_POSITION", "[]");
+            init(position);
+        }
+
         InitialBranchState.State<State> stack
                 = new InitialBranchState.State<>(
                         State.newInstance(initialPositions),
@@ -45,6 +52,8 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
     }
 
     public void init(String pp){
-        initialPositions = JsonHelper.parsePollutedPosition(pp);
+        if(initialPositions == null){
+            initialPositions = JsonHelper.parsePollutedPosition(pp);
+        }
     }
 }
