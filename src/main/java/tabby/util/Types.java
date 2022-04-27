@@ -2,9 +2,6 @@ package tabby.util;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.internal.helpers.collection.Pair;
-
-import java.util.*;
 
 import static org.neo4j.graphdb.Direction.*;
 
