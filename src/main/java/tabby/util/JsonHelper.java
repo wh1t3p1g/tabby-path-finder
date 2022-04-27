@@ -8,7 +8,7 @@ import com.google.gson.Gson;
  */
 public class JsonHelper {
 
-    private static Gson gson = new Gson();
+    public static Gson gson = new Gson();
 
     public static int[] parsePollutedPosition(String position){
         try{
@@ -17,5 +17,4 @@ public class JsonHelper {
             return new int[0];
         }
     }
-
 }

@@ -27,7 +27,4 @@ public abstract class BasePathFinder extends TraversalPathFinder {
     {
         return Uniqueness.NODE_PATH;
     }
-
-
-
 }

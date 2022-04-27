@@ -39,7 +39,6 @@ public class Pools{
                 service.shutdown();
                 service.awaitTermination(10, TimeUnit.SECONDS);
             } catch (InterruptedException ignore) {
-
             }
         });
     }
