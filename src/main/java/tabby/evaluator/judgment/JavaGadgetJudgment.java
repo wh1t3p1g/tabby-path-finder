@@ -22,11 +22,12 @@ public class JavaGadgetJudgment implements Judgment{
         int length = path.length();
         Node node = path.endNode();
         Relationship lastRelationship = path.lastRelationship();
-        Map<String, Object> properties = node.getProperties("IS_SERIALIZABLE", "IS_STATIC");
+        Map<String, Object> properties = node.getProperties("IS_SERIALIZABLE", "IS_STATIC", "IS_ABSTRACT");
 
         boolean isSerializable = (boolean) properties.getOrDefault("IS_SERIALIZABLE", false);
         boolean isStatic = (boolean) properties.getOrDefault("IS_STATIC", false);
-        boolean flag = isStatic || isSerializable || Types.isAlias(lastRelationship);
+        boolean isAbstract = (boolean) properties.getOrDefault("IS_ABSTRACT", false);
+        boolean flag = isStatic || isSerializable || isAbstract || Types.isAlias(lastRelationship);
 
         if(length >= maxDepth){
             continues = false; // 超出长度 不继续进行
