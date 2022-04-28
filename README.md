@@ -28,21 +28,38 @@ call tabby.help("all")
 
 根据内置的sink污点信息进行路径检索
 ```
+tabby.algo.allSimplePaths(
+        sink, sources, 
+        maxNodes, parallel, depthFirst) YIELD path
+```
+例子
+```
 // templates
 match (source:Method {NAME:"readObject"})
+with collect(source) as sources
 match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.allSimplePaths(sink, source, 8) yield path
+call tabby.algo.allSimplePaths(sink, sources, 8, false, true) yield path
 return path limit 1
 ```
 
 提供sink节点的污点信息进行路径检索
 ```
+tabby.algo.allSimplePathsWithState(
+                sink, sources, 
+                maxNodes, state, 
+                parallel, depthFirst) YIELD path
+```
+例子
+```
 // templates
 match (source:Method {NAME:"readObject"})
+with collect(source) as sources
 match (sink:Method {NAME:"invoke"})
-call tabby.algo.allSimplePathsWithState(sink, source, 8, "[-1,0]") yield path
+call tabby.algo.allSimplePathsWithState(sink, sources, 8, "[-1,0]", false, true) yield path
 return path limit 1
 ```
+
+Note: 由于neo4j底层并不支持多线程，所有这两个方法在多线程的情况下有时候会不太稳定，推荐设置parallel为false，牺牲点时间
 
 ## #3 案例
 

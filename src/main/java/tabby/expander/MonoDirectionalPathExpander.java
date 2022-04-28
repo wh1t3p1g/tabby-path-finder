@@ -7,6 +7,9 @@ import tabby.util.Types;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * @author wh1t3p1g
@@ -16,8 +19,9 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
 
     private final Direction direction;
     private final RelationshipType[] relationshipTypes;
+    private boolean parallel = false;
 
-    public MonoDirectionalPathExpander() {
+    public MonoDirectionalPathExpander(boolean parallel) {
         String[] types = new String[]{"<CALL", "<ALIAS"};
         direction = Types.directionFor(types[0]);
         relationshipTypes
@@ -37,31 +41,66 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
         if(lastRelationship == null){
             current = preState.getPositions("initial");
         }else{
-            String id = (String) lastRelationship.getProperty("ID");
+            String id = lastRelationship.getId() + "";
             current = preState.getPositions(id);
         }
 
         State nextState = State.newInstance();
         Iterable<Relationship> relationships = node.getRelationships(direction, relationshipTypes);
         List<Relationship> nextRelationships = new ArrayList<>();
-        for(Relationship next:relationships){
-            String nextId = (String) next.getProperty("ID");
-            if(Types.isAlias(next.getType())){
-                nextState.put(nextId, current);
-                nextRelationships.add(next);
-            }else{
-                String polluted = (String) next.getProperty("POLLUTED_POSITION", "[]");
-                int[] nextPos = preState.test(current, polluted);
-                if(nextPos != null && nextPos.length > 0){
-                    nextState.put(nextId, nextPos);
-                    nextRelationships.add(next);
-                }
-            }
-        }
+
+        int[] finalCurrent = current;
+        nextRelationships = StreamSupport.stream(relationships.spliterator(), parallel)
+                .map((next) ->
+                        process(next,
+                                finalCurrent, nextState))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
         state.setState(nextState);
         return nextRelationships;
     }
 
+    public Relationship process(Relationship relationship,
+                                int[] polluted, State state){
+        Relationship ret = null;
+        String nextId = relationship.getId() + "";
+        if(Types.isAlias(relationship.getType())){
+            state.put(nextId, polluted);
+            ret = relationship;
+        }else{
+            String pollutedStr = getData(relationship,"POLLUTED_POSITION");
+            if(pollutedStr == null) return ret;
+            int[] nextPos = state.test(polluted, pollutedStr);
+            if(nextPos != null && nextPos.length > 0){
+                state.put(nextId, nextPos);
+                ret = relationship;
+            }
+        }
+        return ret;
+    }
+
+    // 多线程的情况下，可能会产生获取不到内容的情况，重复取3次
+    public String getData(Relationship relationship, String key){
+        int times = 3;
+        String data = null;
+        do{
+            times--;
+            try{
+                data = (String) relationship.getProperty(key);
+            }catch (Exception e){
+                e.printStackTrace();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }while(data == null && times > 0);
+
+
+        return data;
+    }
     @Override
     public PathExpander<State> reverse() {
         return null;

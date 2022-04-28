@@ -13,7 +13,7 @@ public class State {
     private Map<String, int[]> positions;
 
     public State() {
-        this.positions = new HashMap<>();
+        this.positions = Collections.synchronizedMap(new HashMap<>());
     }
 
     public int[] getPositions(String id){

@@ -1,5 +1,8 @@
 package tabby.util;
 
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.kernel.lifecycle.LifecycleAdapter;
+
 import java.util.concurrent.*;
 import java.util.stream.Stream;
 
@@ -8,13 +11,20 @@ import java.util.stream.Stream;
  * @author wh1t3p1g
  * @since 2022/1/7
  */
-public class Pools{
+public class Pools extends LifecycleAdapter {
+
     public final static int DEFAULT_POOL_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
-    private final ExecutorService singleExecutorService;
-    private final ExecutorService defaultExecutorService;
+    private ExecutorService singleExecutorService;
+    private ExecutorService defaultExecutorService;
 
-    public Pools(){
+    public Pools() {
+        init();
+    }
+
+    @Override
+    public void init() {
+
         int threads = Math.max(1, DEFAULT_POOL_THREADS);
 
         int queueSize = Math.max(1, threads * 5);
@@ -33,12 +43,14 @@ public class Pools{
 
     }
 
+    @Override
     public void shutdown() throws Exception {
-        Stream.of(singleExecutorService, defaultExecutorService).forEach(service -> {
+        Stream.of(singleExecutorService, defaultExecutorService).forEach( service -> {
             try {
                 service.shutdown();
                 service.awaitTermination(10, TimeUnit.SECONDS);
             } catch (InterruptedException ignore) {
+
             }
         });
     }
@@ -49,20 +61,6 @@ public class Pools{
 
     public ExecutorService getDefaultExecutorService() {
         return defaultExecutorService;
-    }
-
-    public static <T> T force(Future<T> future) throws ExecutionException {
-        while (true) {
-            try {
-                return future.get();
-            } catch (InterruptedException e) {
-                Thread.interrupted();
-            }
-        }
-    }
-
-    public static Pools newInstance(){
-        return new Pools();
     }
 
     static class CallerBlocksPolicy implements RejectedExecutionHandler {
@@ -92,6 +90,36 @@ public class Pools{
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }
+    }
+
+    public Future<Relationship> processNextRelationship(Relationship relationship,
+                                                        int[] polluted, State state){
+        return defaultExecutorService.submit(() -> {
+            Relationship ret = null;
+            String nextId = (String) relationship.getProperty("ID");
+            if(Types.isAlias(relationship.getType())){
+                state.put(nextId, polluted);
+                ret = relationship;
+            }else{
+                String pollutedStr = (String) relationship.getProperty("POLLUTED_POSITION", "[]");
+                int[] nextPos = state.test(polluted, pollutedStr);
+                if(nextPos != null && nextPos.length > 0){
+                    state.put(nextId, nextPos);
+                    ret = relationship;
+                }
+            }
+            return ret;
+        });
+    }
+
+    public static <T> T force(Future<T> future) throws ExecutionException {
+        while (true) {
+            try {
+                return future.get();
+            } catch (InterruptedException e) {
+                Thread.interrupted();
             }
         }
     }

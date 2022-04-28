@@ -1,7 +1,6 @@
 package tabby.algo;
 
 import org.neo4j.graphalgo.BasicEvaluationContext;
-import org.neo4j.graphalgo.PathFinder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -14,6 +13,7 @@ import tabby.expander.MonoDirectionalPathExpander;
 import tabby.path.MonoDirectionalTraversalPathFinder;
 import tabby.result.PathResult;
 
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -30,41 +30,45 @@ public class PathFinding {
     public Transaction tx;
 
     @Procedure
-    @Description("tabby.algo.allSimplePaths(sink, source, 5) YIELD path, " +
+    @Description("tabby.algo.allSimplePaths(sink, sources, maxNodes, parallel, depthFirst) YIELD path, " +
             "weight - run allSimplePaths with maxNodes")
     public Stream<PathResult> allSimplePaths(
             @Name("sinkNode") Node startNode,
-            @Name("sourceNode") Node endNode,
-            @Name("maxNodes") long maxNodes) {
+            @Name("sourceNode") List<Node> endNodes,
+            @Name("maxNodes") long maxNodes,
+            @Name("parallel") boolean parallel,
+            @Name("depthFirst") boolean depthFirst) {
 
-        PathFinder<Path> algo = new MonoDirectionalTraversalPathFinder(
+        MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                new MonoDirectionalPathExpander(),
-                (int) maxNodes, null
+                new MonoDirectionalPathExpander(parallel),
+                (int) maxNodes, null, depthFirst
         );
 
-        Iterable<Path> allPaths = algo.findAllPaths(startNode, endNode);
+        Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
         return StreamSupport.stream(allPaths.spliterator(), true)
                 .map(PathResult::new);
     }
 
     @Procedure
-    @Description("tabby.algo.allSimplePathsWithState(sink, source, 5, \"[-1,0]\") YIELD path, " +
+    @Description("tabby.algo.allSimplePathsWithState(sink, sources, maxNodes, state, parallel, depthFirst) YIELD path, " +
             "weight - run allSimplePathsWithState with maxNodes and state")
     public Stream<PathResult> allSimplePathsWithState(
             @Name("sinkNode") Node startNode,
-            @Name("sourceNode") Node endNode,
+            @Name("sourceNodes") List<Node> endNodes,
             @Name("maxNodes") long maxNodes,
-            @Name("state") String state) {
+            @Name("state") String state,
+            @Name("parallel") boolean parallel,
+            @Name("depthFirst") boolean depthFirst) {
 
-        PathFinder<Path> algo = new MonoDirectionalTraversalPathFinder(
+        MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                new MonoDirectionalPathExpander(),
+                new MonoDirectionalPathExpander(parallel),
                 (int) maxNodes,
-                state
+                state, depthFirst
         );
 
-        Iterable<Path> allPaths = algo.findAllPaths(startNode, endNode);
+        Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
         return StreamSupport.stream(allPaths.spliterator(), true)
                 .map(PathResult::new);
     }

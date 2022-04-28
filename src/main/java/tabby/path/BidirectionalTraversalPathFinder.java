@@ -8,6 +8,8 @@ import org.neo4j.graphdb.traversal.InitialBranchState;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
 
+import java.util.List;
+
 import static org.neo4j.graphdb.traversal.Evaluators.toDepth;
 
 /**
@@ -18,6 +20,11 @@ public class BidirectionalTraversalPathFinder extends BasePathFinder{
 
     public BidirectionalTraversalPathFinder(EvaluationContext context, PathExpander expander, int maxDepth, boolean depthFirst) {
         super(context, expander, maxDepth, depthFirst);
+    }
+
+    @Override
+    protected Traverser instantiateTraverser(Node start, List<Node> ends) {
+        return null;
     }
 
     @Override
