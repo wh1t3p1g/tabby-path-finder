@@ -26,9 +26,10 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
         direction = Types.directionFor(types[0]);
         relationshipTypes
                 = new RelationshipType[]{
-                Types.relationshipTypeFor(types[0]),
-                Types.relationshipTypeFor(types[1])
-        };
+                    Types.relationshipTypeFor(types[0]),
+                    Types.relationshipTypeFor(types[1])
+                };
+        this.parallel = parallel;
     }
 
     @Override
