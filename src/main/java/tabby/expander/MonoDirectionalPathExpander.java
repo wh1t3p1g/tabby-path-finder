@@ -99,7 +99,6 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
             }
         }while(data == null && times > 0);
 
-
         return data;
     }
     @Override

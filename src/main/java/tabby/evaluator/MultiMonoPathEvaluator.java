@@ -5,11 +5,14 @@ import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.traversal.BranchState;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.PathEvaluator;
+import tabby.evaluator.judgment.CommonJudgment;
+import tabby.evaluator.judgment.Judgment;
 import tabby.util.State;
 
 import java.util.List;
 
 /**
+ * 一对多
  * @author wh1t3p1g
  * @since 2022/1/6
  */
@@ -17,37 +20,28 @@ public class MultiMonoPathEvaluator extends PathEvaluator.Adapter<State> {
 
     private List<Node> endNodes;
     private int maxDepth;
+    private Judgment judgment;
 
     public MultiMonoPathEvaluator(List<Node> endNodes, int maxDepth) {
+        this(endNodes, maxDepth, new CommonJudgment());
+    }
+
+    public MultiMonoPathEvaluator(List<Node> endNodes, int maxDepth, Judgment judgment) {
         this.endNodes = endNodes;
         this.maxDepth = maxDepth;
+        this.judgment = judgment;
     }
 
     @Override
     public Evaluation evaluate(Path path, BranchState<State> state) {
-        boolean includes = true;
-        boolean continues = true;
-        int length = path.length();
-        Node node = path.endNode();
-
-        if(length >= maxDepth){
-            continues = false; // 超出长度 不继续进行
-            if(endNodes != null && !endNodes.contains(node)){
-                includes = false; // 最后的节点不是endNode，不保存当前结果
-            }
-        }else if(length == 0){ // 开始节点
-            includes = false;
-        } else if(endNodes != null && endNodes.contains(node)){
-            // 长度没到，但已经找到了endNode，停止进行
-            continues = false;
-        } else {
-            includes = false;
-        }
-
-        return Evaluation.of(includes, continues);
+        return judgment.judge(path, endNodes, maxDepth);
     }
 
     public static MultiMonoPathEvaluator of(List<Node> endNodes, int maxDepth){
         return new MultiMonoPathEvaluator(endNodes, maxDepth);
+    }
+
+    public static MultiMonoPathEvaluator of(List<Node> endNodes, int maxDepth, Judgment judgment){
+        return new MultiMonoPathEvaluator(endNodes, maxDepth, judgment);
     }
 }

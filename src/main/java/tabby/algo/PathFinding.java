@@ -9,6 +9,7 @@ import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
+import tabby.evaluator.judgment.JavaGadgetJudgment;
 import tabby.expander.MonoDirectionalPathExpander;
 import tabby.path.MonoDirectionalTraversalPathFinder;
 import tabby.result.PathResult;
@@ -42,7 +43,7 @@ public class PathFinding {
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
                 new MonoDirectionalPathExpander(parallel),
-                (int) maxNodes, null, depthFirst
+                (int) maxNodes, null, depthFirst, null
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
@@ -65,7 +66,30 @@ public class PathFinding {
                 new BasicEvaluationContext(tx, db),
                 new MonoDirectionalPathExpander(parallel),
                 (int) maxNodes,
-                state, depthFirst
+                state, depthFirst, null
+        );
+
+        Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
+        return StreamSupport.stream(allPaths.spliterator(), true)
+                .map(PathResult::new);
+    }
+
+    @Procedure
+    @Description("tabby.algo.findJavaGadget(sink, sources, maxNodes, state, parallel, depthFirst) YIELD path, " +
+            "weight - run findJavaGadget with maxNodes and state")
+    public Stream<PathResult> findJavaGadget(
+            @Name("sinkNode") Node startNode,
+            @Name("sourceNodes") List<Node> endNodes,
+            @Name("maxNodes") long maxNodes,
+            @Name("state") String state,
+            @Name("parallel") boolean parallel,
+            @Name("depthFirst") boolean depthFirst) {
+
+        MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
+                new BasicEvaluationContext(tx, db),
+                new MonoDirectionalPathExpander(parallel),
+                (int) maxNodes,
+                state, depthFirst, new JavaGadgetJudgment()
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
