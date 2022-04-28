@@ -2,7 +2,9 @@ package tabby.evaluator.judgment;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.Evaluation;
+import tabby.util.Types;
 
 import java.util.List;
 import java.util.Map;
@@ -19,12 +21,12 @@ public class JavaGadgetJudgment implements Judgment{
         boolean continues = true;
         int length = path.length();
         Node node = path.endNode();
-        Map<String, Object> properties = node.getProperties("IS_SERIALIZABLE", "IS_STATIC", "IS_ABSTRACT");
+        Relationship lastRelationship = path.lastRelationship();
+        Map<String, Object> properties = node.getProperties("IS_SERIALIZABLE", "IS_STATIC");
 
         boolean isSerializable = (boolean) properties.getOrDefault("IS_SERIALIZABLE", false);
         boolean isStatic = (boolean) properties.getOrDefault("IS_STATIC", false);
-        boolean isAbstract = (boolean) properties.getOrDefault("IS_ABSTRACT", false);
-        boolean flag = isStatic || isSerializable || isAbstract;
+        boolean flag = isStatic || isSerializable || Types.isAlias(lastRelationship);
 
         if(length >= maxDepth){
             continues = false; // 超出长度 不继续进行

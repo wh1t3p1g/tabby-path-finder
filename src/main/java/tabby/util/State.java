@@ -38,20 +38,27 @@ public class State {
         return state;
     }
 
-    public int[] test(int[] current, String polluted){
+    public int[] test(int[] current, String polluted, boolean isLastRelationshipTypeAlias){
         try{
             int[][] callPos = JsonHelper.gson.fromJson(polluted, int[][].class);
-            return test(current, callPos);
+            return test(current, callPos, isLastRelationshipTypeAlias);
         }catch (Exception e){
             // 兼容tabby 1.x版本
             int[] callPos = JsonHelper.gson.fromJson(polluted, int[].class);
-            return test(current, callPos);
+            return test(current, callPos, isLastRelationshipTypeAlias);
         }
 
     }
 
-    public int[] test(int[] current, int[][] callPos){
+    public int[] test(int[] current, int[][] callPos, boolean isLastRelationshipTypeAlias){
         Set<Integer> newPolluted = new HashSet<>();
+
+        // 对于上一条边为alias的，但是当前的call边 调用者又是不可控的，那说明无法进行alias操作，直接剔除
+        if(isLastRelationshipTypeAlias && callPos.length > 0
+                && callPos[0].length == 1 && callPos[0][0] == -3){
+            return null;
+        }
+
         for(int p : current){
             int pos = p + 1;
             if(pos < callPos.length){
@@ -65,8 +72,13 @@ public class State {
         return newPolluted.stream().mapToInt(Integer::intValue).toArray();
     }
 
-    public int[] test(int[] current, int[] callPos){
+    public int[] test(int[] current, int[] callPos, boolean isLastRelationshipTypeAlias){
         Set<Integer> newPolluted = new HashSet<>();
+
+        if(isLastRelationshipTypeAlias && callPos.length > 0 && callPos[0] == -3){
+            return null;
+        }
+
         for(int p : current){
             int pos = p + 1;
             if(pos < callPos.length){

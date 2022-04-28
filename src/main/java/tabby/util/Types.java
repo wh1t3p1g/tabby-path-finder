@@ -1,6 +1,7 @@
 package tabby.util;
 
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 
 import static org.neo4j.graphdb.Direction.*;
@@ -22,7 +23,11 @@ public class Types {
         return name.trim().isEmpty() ? null : RelationshipType.withName(name);
     }
 
-    public static boolean isAlias(RelationshipType relationshipType){
-        return "ALIAS".equals(relationshipType.name());
+    public static boolean isAlias(Relationship relationship){
+        if(relationship != null){
+            RelationshipType type = relationship.getType();
+            return "ALIAS".equals(type.name());
+        }
+        return false;
     }
 }

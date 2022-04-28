@@ -39,11 +39,13 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
         State preState = state.getState();
 
         int[] current = null;
+        boolean isLastRelationshipTypeAlias = false;
         if(lastRelationship == null){
             current = preState.getPositions("initial");
         }else{
             String id = lastRelationship.getId() + "";
             current = preState.getPositions(id);
+            isLastRelationshipTypeAlias = Types.isAlias(lastRelationship);
         }
 
         State nextState = State.newInstance();
@@ -51,9 +53,10 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
         List<Relationship> nextRelationships = new ArrayList<>();
 
         int[] finalCurrent = current;
+        boolean finalIsLastRelationshipTypeAlias = isLastRelationshipTypeAlias;
         nextRelationships = StreamSupport.stream(relationships.spliterator(), parallel)
                 .map((next) ->
-                        process(next,
+                        process(next, finalIsLastRelationshipTypeAlias,
                                 finalCurrent, nextState))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -62,20 +65,21 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
         return nextRelationships;
     }
 
-    public Relationship process(Relationship relationship,
+    public Relationship process(Relationship currentRelationship,
+                                boolean isLastRelationshipTypeAlias,
                                 int[] polluted, State state){
         Relationship ret = null;
-        String nextId = relationship.getId() + "";
-        if(Types.isAlias(relationship.getType())){
+        String nextId = currentRelationship.getId() + "";
+        if(Types.isAlias(currentRelationship)){
             state.put(nextId, polluted);
-            ret = relationship;
+            ret = currentRelationship;
         }else{
-            String pollutedStr = getData(relationship,"POLLUTED_POSITION");
+            String pollutedStr = getData(currentRelationship,"POLLUTED_POSITION");
             if(pollutedStr == null) return ret;
-            int[] nextPos = state.test(polluted, pollutedStr);
+            int[] nextPos = state.test(polluted, pollutedStr, isLastRelationshipTypeAlias);
             if(nextPos != null && nextPos.length > 0){
                 state.put(nextId, nextPos);
-                ret = relationship;
+                ret = currentRelationship;
             }
         }
         return ret;
