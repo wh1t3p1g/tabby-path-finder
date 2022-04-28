@@ -74,4 +74,6 @@ Note: tricks:
 
 ## #3 案例
 
-TODO
+见cyphers目录
+
+目前，查询结果基于tabby 2.0，暂未测试tabby 1.x
