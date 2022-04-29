@@ -1,6 +1,0 @@
-//tabby endpoint to sink search
-match (source:Method {NAME:"readObject",IS_SERIALIZABLE:true, CLASSNAME:"javax.management.BadAttributeValueExpException"})
-with collect(source) as sources
-match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.findJavaGadget(sink, sources, 12, null, false, false) yield path where none(n in nodes(path) where n.NAME0 in ["java.util.Map$Entry.getValue"])
-return path limit 1

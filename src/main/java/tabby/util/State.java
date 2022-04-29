@@ -61,14 +61,17 @@ public class State {
 
         for(int p : current){
             int pos = p + 1;
-            if(pos < callPos.length){
+            if(pos < callPos.length && pos >= 0){
                 int[] call = callPos[pos];
                 if(PositionHelper.isNotPollutedPosition(call)) return null;
                 newPolluted.addAll(Arrays.stream(call).boxed().collect(Collectors.toSet()));
-            }else{// 超出数组长度
+            }else if(p == PositionHelper.SOURCE){
+                // do nothing
+            } else{// 超出数组长度 或者 来源-2 source类型 这部分还没想好怎么处理
                 return null;
             }
         }
+        newPolluted.remove(PositionHelper.NOT_POLLUTED_POSITION);
         return newPolluted.stream().mapToInt(Integer::intValue).toArray();
     }
 
@@ -82,14 +85,17 @@ public class State {
 
         for(int p : current){
             int pos = p + 1;
-            if(pos < callPos.length){
+            if(pos < callPos.length && pos >= 0){
                 int call = callPos[pos];
                 if(PositionHelper.isNotPollutedPosition(call)) return null;
                 newPolluted.add(call);
-            }else{ // 超出数组长度
+            }else if(p == PositionHelper.SOURCE){
+                // do nothing
+            } else{// 超出数组长度 或者 来源-2 source类型 这部分还没想好怎么处理
                 return null;
             }
         }
+        newPolluted.remove(PositionHelper.NOT_POLLUTED_POSITION);
         return newPolluted.stream().mapToInt(Integer::intValue).toArray();
     }
 
