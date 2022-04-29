@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 public class State {
 
     private Map<String, int[]> positions;
+    private List<Long> alias;
 
     public State() {
         this.positions = Collections.synchronizedMap(new HashMap<>());
+        this.alias = new ArrayList<>();
     }
 
     public int[] getPositions(String id){
@@ -26,6 +28,14 @@ public class State {
 
     public boolean isEmpty(){
         return positions == null || positions.isEmpty();
+    }
+
+    public boolean isAlias(long id){
+        return alias.contains(id);
+    }
+
+    public void addAliasEdge(long id){
+        alias.add(id);
     }
 
     public static State newInstance(){

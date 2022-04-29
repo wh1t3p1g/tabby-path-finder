@@ -72,6 +72,7 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
         String nextId = currentRelationship.getId() + "";
         if(Types.isAlias(currentRelationship)){
             state.put(nextId, polluted);
+            state.addAliasEdge(currentRelationship.getId());
             ret = currentRelationship;
         }else{
             String pollutedStr = getData(currentRelationship,"POLLUTED_POSITION");
@@ -96,7 +97,7 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
             }catch (Exception e){
                 e.printStackTrace();
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }

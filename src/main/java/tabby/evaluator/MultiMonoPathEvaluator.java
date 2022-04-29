@@ -34,7 +34,7 @@ public class MultiMonoPathEvaluator extends PathEvaluator.Adapter<State> {
 
     @Override
     public Evaluation evaluate(Path path, BranchState<State> state) {
-        return judgment.judge(path, endNodes, maxDepth);
+        return judgment.judge(path, state.getState(), endNodes, maxDepth);
     }
 
     public static MultiMonoPathEvaluator of(List<Node> endNodes, int maxDepth){
