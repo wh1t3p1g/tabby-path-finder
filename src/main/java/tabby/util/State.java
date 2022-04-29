@@ -55,7 +55,7 @@ public class State {
 
         // 对于上一条边为alias的，但是当前的call边 调用者又是不可控的，那说明无法进行alias操作，直接剔除
         if(isLastRelationshipTypeAlias && callPos.length > 0
-                && callPos[0].length == 1 && callPos[0][0] == -3){
+                && PositionHelper.isNotPollutedPosition(callPos[0])){
             return null;
         }
 
@@ -63,7 +63,7 @@ public class State {
             int pos = p + 1;
             if(pos < callPos.length){
                 int[] call = callPos[pos];
-                if(call.length == 1 && call[0] == -3) return null;
+                if(PositionHelper.isNotPollutedPosition(call)) return null;
                 newPolluted.addAll(Arrays.stream(call).boxed().collect(Collectors.toSet()));
             }else{// 超出数组长度
                 return null;
@@ -75,7 +75,8 @@ public class State {
     public int[] test(int[] current, int[] callPos, boolean isLastRelationshipTypeAlias){
         Set<Integer> newPolluted = new HashSet<>();
 
-        if(isLastRelationshipTypeAlias && callPos.length > 0 && callPos[0] == -3){
+        if(isLastRelationshipTypeAlias && callPos.length > 0
+                && PositionHelper.isNotPollutedPosition(callPos[0])){
             return null;
         }
 
@@ -83,7 +84,7 @@ public class State {
             int pos = p + 1;
             if(pos < callPos.length){
                 int call = callPos[pos];
-                if(call == -3) return null;
+                if(PositionHelper.isNotPollutedPosition(call)) return null;
                 newPolluted.add(call);
             }else{ // 超出数组长度
                 return null;
