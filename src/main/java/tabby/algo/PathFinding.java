@@ -10,7 +10,6 @@ import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
 import tabby.evaluator.judgment.CommonJudgment;
-import tabby.evaluator.judgment.JavaGadgetJudgment;
 import tabby.expander.BackwardPathExpander;
 import tabby.expander.ForwardedPathExpander;
 import tabby.expander.processor.ProcessorFactory;
@@ -34,9 +33,9 @@ public class PathFinding {
     public Transaction tx;
 
     @Procedure
-    @Description("tabby.algo.findVul(sink, sources, maxNodes, state, parallel, depthFirst) YIELD path, " +
+    @Description("tabby.algo.allSimplePaths(sink, sources, maxNodes, state, parallel, depthFirst) YIELD path, " +
             "weight - run allSimplePathsWithState with maxNodes and state")
-    public Stream<PathResult> allSimplePathsWithState(
+    public Stream<PathResult> allSimplePaths(
             @Name("sinkNode") Node startNode,
             @Name("sourceNodes") List<Node> endNodes,
             @Name("maxNodes") long maxNodes,
@@ -48,7 +47,7 @@ public class PathFinding {
                 new BasicEvaluationContext(tx, db),
                 new BackwardPathExpander(parallel),
                 (int) maxNodes,
-                state, depthFirst, null
+                state, depthFirst, new CommonJudgment()
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
@@ -57,21 +56,19 @@ public class PathFinding {
     }
 
     @Procedure
-    @Description("tabby.algo.findJavaGadget(sink, sources, maxNodes, state, parallel, depthFirst) YIELD path, " +
-            "weight - run findJavaGadget with maxNodes and state")
+    @Description("tabby.algo.findJavaGadget(source, sinks, maxNodes, depthFirst) YIELD path, " +
+            "weight - run findJavaGadget with maxNodes from source to sink")
     public Stream<PathResult> findJavaGadget(
-            @Name("sinkNode") Node startNode,
-            @Name("sourceNodes") List<Node> endNodes,
-            @Name("maxNodes") long maxNodes,
-            @Name("state") String state,
-            @Name("parallel") boolean parallel,
+            @Name("startNode") Node startNode,
+            @Name("endNodes") List<Node> endNodes,
+            @Name("maxLength") long maxLength,
             @Name("depthFirst") boolean depthFirst) {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                new BackwardPathExpander(parallel),
-                (int) maxNodes,
-                state, depthFirst, new JavaGadgetJudgment()
+                new ForwardedPathExpander(false, ProcessorFactory.newInstance("JavaGadget")),
+                (int) maxLength, getInitialPositions(startNode),
+                depthFirst, new CommonJudgment()
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
@@ -88,23 +85,26 @@ public class PathFinding {
             @Name("maxLength") long maxLength,
             @Name("depthFirst") boolean depthFirst) {
 
-        long parameterSize = (long) startNode.getProperty("PARAMETER_SIZE", 0);
-        int[] initialPositions = new int[(int) (parameterSize+1)];
-        initialPositions[0] = -1; // check this
-        for(int i=0; i<parameterSize;i++){
-            initialPositions[i+1] = i;
-        }
-
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
                 new ForwardedPathExpander(false, ProcessorFactory.newInstance("Common")),
-                (int) maxLength, initialPositions,
+                (int) maxLength, getInitialPositions(startNode),
                 depthFirst, new CommonJudgment()
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
         return StreamSupport.stream(allPaths.spliterator(), true)
                 .map(PathResult::new);
+    }
+
+    public int[] getInitialPositions(Node node){
+        long parameterSize = (long) node.getProperty("PARAMETER_SIZE", 0);
+        int[] initialPositions = new int[(int) (parameterSize+1)];
+        initialPositions[0] = -1; // check this
+        for(int i=0; i<parameterSize;i++){
+            initialPositions[i+1] = i;
+        }
+        return initialPositions;
     }
 
 }

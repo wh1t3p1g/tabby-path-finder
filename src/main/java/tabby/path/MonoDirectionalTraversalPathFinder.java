@@ -9,7 +9,6 @@ import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
 import tabby.evaluator.MonoPathEvaluator;
 import tabby.evaluator.MultiMonoPathEvaluator;
-import tabby.evaluator.judgment.CommonJudgment;
 import tabby.evaluator.judgment.Judgment;
 import tabby.util.JsonHelper;
 import tabby.util.State;
@@ -34,11 +33,8 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
                                               Judgment judgment
     ) {
         super(context, expander, maxDepth, depthFirst);
-        if(judgment == null){
-            this.judgment = new CommonJudgment();
-        }else{
-            this.judgment = judgment;
-        }
+
+        this.judgment = judgment;
         if(state != null){
             init(state);
         }
@@ -52,11 +48,8 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
                                               Judgment judgment
     ) {
         super(context, expander, maxDepth, depthFirst);
-        if(judgment == null){
-            this.judgment = new CommonJudgment();
-        }else{
-            this.judgment = judgment;
-        }
+
+        this.judgment = judgment;
         this.initialPositions = initialPositions;
         this.stack = new InitialBranchState.State<>(
                 State.newInstance(initialPositions),
