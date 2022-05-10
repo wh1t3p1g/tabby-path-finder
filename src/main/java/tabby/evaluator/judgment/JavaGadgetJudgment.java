@@ -24,7 +24,8 @@ public class JavaGadgetJudgment implements Judgment{
 
         Node node = path.endNode();
         Relationship lastRelationship = path.lastRelationship();
-        Map<String, Object> properties = node.getProperties("IS_SERIALIZABLE", "IS_STATIC", "IS_ABSTRACT", "IS_FROM_ABSTRACT_CLASS");
+        Map<String, Object> properties = node.getProperties(
+                "IS_SERIALIZABLE", "IS_STATIC", "IS_ABSTRACT", "IS_FROM_ABSTRACT_CLASS");
 
         boolean isSerializable = (boolean) properties.getOrDefault("IS_SERIALIZABLE", false);
         boolean isStatic = (boolean) properties.getOrDefault("IS_STATIC", false);

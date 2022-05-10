@@ -27,7 +27,7 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
     private Judgment judgment;
 
     public MonoDirectionalTraversalPathFinder(EvaluationContext context,
-                                              PathExpander expander,
+                                              PathExpander<State> expander,
                                               int maxDepth,
                                               String state,
                                               boolean depthFirst,
@@ -42,6 +42,25 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
         if(state != null){
             init(state);
         }
+    }
+
+    public MonoDirectionalTraversalPathFinder(EvaluationContext context,
+                                              PathExpander<State> expander,
+                                              int maxDepth,
+                                              int[] initialPositions,
+                                              boolean depthFirst,
+                                              Judgment judgment
+    ) {
+        super(context, expander, maxDepth, depthFirst);
+        if(judgment == null){
+            this.judgment = new CommonJudgment();
+        }else{
+            this.judgment = judgment;
+        }
+        this.initialPositions = initialPositions;
+        this.stack = new InitialBranchState.State<>(
+                State.newInstance(initialPositions),
+                State.newInstance(initialPositions));
     }
 
     @Override

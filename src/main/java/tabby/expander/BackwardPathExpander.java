@@ -2,26 +2,33 @@ package tabby.expander;
 
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.traversal.BranchState;
+import tabby.calculator.BackwardCalculator;
+import tabby.calculator.Calculator;
+import tabby.util.JsonHelper;
+import tabby.util.PositionHelper;
 import tabby.util.State;
 import tabby.util.Types;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
+ * from sink to source
  * @author wh1t3p1g
  * @since 2022/4/26
  */
-public class MonoDirectionalPathExpander implements PathExpander<State> {
+public class BackwardPathExpander implements PathExpander<State> {
 
     private final Direction direction;
     private final RelationshipType[] relationshipTypes;
     private boolean parallel = false;
+    private Calculator calculator;
 
-    public MonoDirectionalPathExpander(boolean parallel) {
+    public BackwardPathExpander(boolean parallel) {
         String[] types = new String[]{"<CALL", "<ALIAS"};
         direction = Types.directionFor(types[0]);
         relationshipTypes
@@ -30,6 +37,7 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
                     Types.relationshipTypeFor(types[1])
                 };
         this.parallel = parallel;
+        this.calculator = new BackwardCalculator();
     }
 
     @Override
@@ -50,11 +58,10 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
 
         State nextState = State.newInstance();
         Iterable<Relationship> relationships = node.getRelationships(direction, relationshipTypes);
-        List<Relationship> nextRelationships = new ArrayList<>();
 
         int[] finalCurrent = current;
         boolean finalIsLastRelationshipTypeAlias = isLastRelationshipTypeAlias;
-        nextRelationships = StreamSupport.stream(relationships.spliterator(), parallel)
+        List<Relationship> nextRelationships = StreamSupport.stream(relationships.spliterator(), parallel)
                 .map((next) ->
                         process(next, finalIsLastRelationshipTypeAlias,
                                 finalCurrent, nextState))
@@ -77,13 +84,37 @@ public class MonoDirectionalPathExpander implements PathExpander<State> {
         }else{
             String pollutedStr = getData(currentRelationship,"POLLUTED_POSITION");
             if(pollutedStr == null) return ret;
-            int[] nextPos = state.test(polluted, pollutedStr, isLastRelationshipTypeAlias);
+            int[] nextPos = calculate(pollutedStr,
+                    Arrays.stream(polluted).boxed().collect(Collectors.toSet()),
+                    isLastRelationshipTypeAlias);
             if(nextPos != null && nextPos.length > 0){
                 state.put(nextId, nextPos);
                 ret = currentRelationship;
             }
         }
         return ret;
+    }
+
+    public int[] calculate(String callSite, Set<Integer> polluted, boolean isLastRelationshipTypeAlias){
+        try{
+            int[][] callPos = JsonHelper.gson.fromJson(callSite, int[][].class);
+
+            if(isLastRelationshipTypeAlias && callPos.length > 0
+                    && PositionHelper.isNotPollutedPosition(callPos[0])){
+                return null;
+            }
+
+            return calculator.v2(callPos, polluted);
+        }catch (Exception e){
+            int[] callPos = JsonHelper.gson.fromJson(callSite, int[].class);
+
+            if(isLastRelationshipTypeAlias && callPos.length > 0
+                    && PositionHelper.isNotPollutedPosition(callPos[0])){
+                return null;
+            }
+
+            return calculator.v1(callPos, polluted);
+        }
     }
 
     // 多线程的情况下，可能会产生获取不到内容的情况，重复取3次
