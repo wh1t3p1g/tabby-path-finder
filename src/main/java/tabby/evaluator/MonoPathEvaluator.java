@@ -5,7 +5,7 @@ import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.traversal.BranchState;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.PathEvaluator;
-import tabby.util.State;
+import tabby.data.State;
 
 /**
  * 一对一

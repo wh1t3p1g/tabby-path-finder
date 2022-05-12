@@ -7,7 +7,7 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.PathEvaluator;
 import tabby.evaluator.judgment.CommonJudgment;
 import tabby.evaluator.judgment.Judgment;
-import tabby.util.State;
+import tabby.data.State;
 
 import java.util.List;
 

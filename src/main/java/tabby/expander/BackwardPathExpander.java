@@ -4,9 +4,9 @@ import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.traversal.BranchState;
 import tabby.calculator.BackwardCalculator;
 import tabby.calculator.Calculator;
+import tabby.data.State;
 import tabby.util.JsonHelper;
 import tabby.util.PositionHelper;
-import tabby.util.State;
 import tabby.util.Types;
 
 import java.util.Arrays;

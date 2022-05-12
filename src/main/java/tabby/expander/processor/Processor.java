@@ -3,7 +3,7 @@ package tabby.expander.processor;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import tabby.calculator.Calculator;
-import tabby.util.State;
+import tabby.data.State;
 
 /**
  * @author wh1t3p1g

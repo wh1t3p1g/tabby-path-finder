@@ -1,4 +1,7 @@
-package tabby.util;
+package tabby.data;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
@@ -6,6 +9,8 @@ import java.util.*;
  * @author wh1t3p1g
  * @since 2022/4/26
  */
+@Getter
+@Setter
 public class State {
 
     private Map<String, int[]> positions;
@@ -32,14 +37,6 @@ public class State {
 
     public boolean isAlias(long id){
         return alias.contains(id);
-    }
-
-    public void setStaticCalls(List<Long> staticCalls) {
-        this.staticCalls = staticCalls;
-    }
-
-    public List<Long> getStaticCalls() {
-        return staticCalls;
     }
 
     public boolean isStaticCall(long id){

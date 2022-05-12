@@ -4,7 +4,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.Evaluation;
-import tabby.util.State;
+import tabby.data.State;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +13,7 @@ import java.util.Map;
  * @author wh1t3p1g
  * @since 2022/4/28
  */
+@Deprecated
 public class JavaGadgetJudgment implements Judgment{
 
     @Override

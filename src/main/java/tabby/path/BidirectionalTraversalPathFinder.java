@@ -16,6 +16,7 @@ import static org.neo4j.graphdb.traversal.Evaluators.toDepth;
  * @author wh1t3p1g
  * @since 2022/1/6
  */
+@Deprecated
 public class BidirectionalTraversalPathFinder extends BasePathFinder{
 
     public BidirectionalTraversalPathFinder(EvaluationContext context, PathExpander expander, int maxDepth, boolean depthFirst) {

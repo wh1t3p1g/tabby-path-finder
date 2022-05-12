@@ -7,11 +7,11 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.InitialBranchState;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
+import tabby.data.State;
 import tabby.evaluator.MonoPathEvaluator;
 import tabby.evaluator.MultiMonoPathEvaluator;
 import tabby.evaluator.judgment.Judgment;
 import tabby.util.JsonHelper;
-import tabby.util.State;
 
 import java.util.List;
 

@@ -20,7 +20,12 @@
             <artifactId>gson</artifactId>
             <version>2.9.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <!-- This gives us the Procedure API our runtime code uses.
                  We have a `provided` scope on it, because when this is

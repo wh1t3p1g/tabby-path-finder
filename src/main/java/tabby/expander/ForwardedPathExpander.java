@@ -5,7 +5,7 @@ import org.neo4j.graphdb.traversal.BranchState;
 import tabby.calculator.Calculator;
 import tabby.calculator.ForwardedCalculator;
 import tabby.expander.processor.Processor;
-import tabby.util.State;
+import tabby.data.State;
 import tabby.util.Types;
 
 import java.util.ArrayList;

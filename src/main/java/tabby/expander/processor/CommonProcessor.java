@@ -2,7 +2,7 @@ package tabby.expander.processor;
 
 import org.neo4j.graphdb.Relationship;
 import tabby.util.PositionHelper;
-import tabby.util.State;
+import tabby.data.State;
 import tabby.util.Types;
 
 /**
