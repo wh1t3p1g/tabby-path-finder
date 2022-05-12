@@ -25,41 +25,33 @@ help
 ```
 call tabby.help("all")
 ```
+目前，tabby-path-finder支持2种方式的路径查找
+1. 正向查找，from source to sink
+2. 逆向查找，from sink to source
 
-根据内置的sink污点信息进行路径检索
+正向查找
 ```
-tabby.algo.allSimplePaths(
-        sink, sources, 
-        maxNodes, parallel, depthFirst) YIELD path
+tabby.algo.findVul(source, sinks, maxDepth, depthFirst) yield path
+tabby.algo.findJavaGadget(source, sinks, maxDepth, depthFirst) yield path
 ```
-例子
+
+其中findJavaGadget会根据java原生反序列化的规则来查找利用链，但是会有一些bug。推荐用完该函数之后再用findVul排除一下。
+
+逆向查找
 ```
-// templates
-match (source:Method {NAME:"readObject"})
-with collect(source) as sources
-match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.allSimplePaths(sink, sources, 8, false, true) yield path
+tabby.algo.allSimplePaths(sink, sources, maxDepth, state, depthFirst) yield path
+```
+
+通用的语法，更多的用法参考neo4j cypher语法
+```
+match (source:Method {NAME:"readObject"}) // 限定source
+match (sink:Method {IS_SINK:true, NAME:"invoke"}) // 限定sink
+with source, collect(sink) as sinks // 聚合sink
+call tabby.algo.findJavaGadget(source, sinks, 8, false) yield path where none(n in nodes(path) where n.CLASSNAME in ["java.io.ObjectInputStream","org.apache.commons.beanutils.BeanMap","org.apache.commons.collections4.functors.PrototypeFactory$PrototypeCloneFactory"])
 return path limit 1
 ```
 
-提供sink节点的污点信息进行路径检索
-```
-tabby.algo.allSimplePathsWithState(
-                sink, sources, 
-                maxNodes, state, 
-                parallel, depthFirst) YIELD path
-```
-例子
-```
-// templates
-match (source:Method {NAME:"readObject"})
-with collect(source) as sources
-match (sink:Method {NAME:"invoke"})
-call tabby.algo.allSimplePathsWithState(sink, sources, 8, "[-1,0]", false, true) yield path
-return path limit 1
-```
-
-Note: 由于neo4j底层并不支持多线程，所有这两个方法在多线程的情况下有时候会不太稳定，推荐设置parallel为false，牺牲点时间
+Note: 由于neo4j底层并不支持多线程，当前所有接口都剔除了多线程的参数配置
 
 Note: 关于效果的说明：
     

@@ -33,19 +33,18 @@ public class PathFinding {
     public Transaction tx;
 
     @Procedure
-    @Description("tabby.algo.allSimplePaths(sink, sources, maxNodes, state, parallel, depthFirst) YIELD path, " +
+    @Description("tabby.algo.allSimplePaths(sink, sources, maxNodes, state, depthFirst) YIELD path, " +
             "weight - run allSimplePathsWithState with maxNodes and state")
     public Stream<PathResult> allSimplePaths(
             @Name("sinkNode") Node startNode,
             @Name("sourceNodes") List<Node> endNodes,
             @Name("maxNodes") long maxNodes,
             @Name("state") String state,
-            @Name("parallel") boolean parallel,
             @Name("depthFirst") boolean depthFirst) {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                new BackwardPathExpander(parallel),
+                new BackwardPathExpander(false),
                 (int) maxNodes,
                 state, depthFirst, new CommonJudgment()
         );
