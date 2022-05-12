@@ -97,7 +97,7 @@ public class BackwardPathExpander implements PathExpander<State> {
 
     public int[] calculate(String callSite, Set<Integer> polluted, boolean isLastRelationshipTypeAlias){
         try{
-            int[][] callPos = JsonHelper.gson.fromJson(callSite, int[][].class);
+            int[][] callPos = JsonHelper.parse(callSite);
 
             if(isLastRelationshipTypeAlias && callPos.length > 0
                     && PositionHelper.isNotPollutedPosition(callPos[0])){
@@ -106,15 +106,8 @@ public class BackwardPathExpander implements PathExpander<State> {
 
             return calculator.v2(callPos, polluted);
         }catch (Exception e){
-            int[] callPos = JsonHelper.gson.fromJson(callSite, int[].class);
-
-            if(isLastRelationshipTypeAlias && callPos.length > 0
-                    && PositionHelper.isNotPollutedPosition(callPos[0])){
-                return null;
-            }
-
-            return calculator.v1(callPos, polluted);
         }
+        return new int[0];
     }
 
     // 多线程的情况下，可能会产生获取不到内容的情况，重复取3次

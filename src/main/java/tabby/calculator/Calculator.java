@@ -1,7 +1,5 @@
 package tabby.calculator;
 
-import tabby.util.JsonHelper;
-
 import java.util.Set;
 
 /**
@@ -10,18 +8,14 @@ import java.util.Set;
  */
 public interface Calculator {
 
-    int[] v1(int[] callSite, Set<Integer> polluted);
-
     int[] v2(int[][] callSite, Set<Integer> polluted);
 
-    default int[] calculate(String callSite, Set<Integer> polluted){
+    default int[] calculate(int[][] callSite, Set<Integer> polluted){
         try{
-            int[][] callPos = JsonHelper.gson.fromJson(callSite, int[][].class);
-            return v2(callPos, polluted);
+            return v2(callSite, polluted);
         }catch (Exception e){
-            int[] callPos = JsonHelper.gson.fromJson(callSite, int[].class);
-            return v1(callPos, polluted);
         }
+        return new int[0];
     }
 
 }

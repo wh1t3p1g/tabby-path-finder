@@ -17,4 +17,18 @@ public class JsonHelper {
             return new int[0];
         }
     }
+
+    public static int[][] parse(String polluted){
+        try{
+            return gson.fromJson(polluted, int[][].class);
+        }catch (Exception e){
+            // 强制转化 v1版本的callSite
+            int[] position = gson.fromJson(polluted, int[].class);
+            int[][] ret = new int[position.length][];
+            for(int i=0;i<position.length;i++){
+                ret[i] = new int[]{position[i]};
+            }
+            return ret;
+        }
+    }
 }

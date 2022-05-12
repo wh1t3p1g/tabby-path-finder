@@ -40,6 +40,15 @@ public class ForwardedPathExpander implements PathExpander<State> {
         this.calculator = new ForwardedCalculator();
     }
 
+    public RelationshipType[] getRelationshipTypes(Relationship relationship, State state){
+        if(relationship != null && state.getNextAlias().contains(relationship.getId())){
+            return new RelationshipType[]{
+                    Types.relationshipTypeFor("CALL>"),
+            };
+        }
+        return relationshipTypes;
+    }
+
     @Override
     public Iterable<Relationship> expand(Path path, BranchState<State> state) {
         final Node node = path.endNode();
@@ -47,7 +56,7 @@ public class ForwardedPathExpander implements PathExpander<State> {
         processor.init(node, state.getState(), lastRelationship, calculator);
 
         if(processor.isNeedProcess()){
-            Iterable<Relationship> relationships = node.getRelationships(direction, relationshipTypes);
+            Iterable<Relationship> relationships = node.getRelationships(direction, getRelationshipTypes(lastRelationship, state.getState()));
             List<Relationship> nextRelationships = StreamSupport.stream(relationships.spliterator(), parallel)
                     .map((next) -> processor.process(next))
                     .filter(Objects::nonNull)

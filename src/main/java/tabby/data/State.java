@@ -16,11 +16,13 @@ public class State {
     private Map<String, int[]> positions;
     private List<Long> alias;
     private List<Long> staticCalls;
+    private List<Long> nextAlias; // 是否允许下一个节点进行alias操作
 
     public State() {
         this.positions = Collections.synchronizedMap(new HashMap<>());
         this.alias = new ArrayList<>();
         this.staticCalls = new ArrayList<>();
+        this.nextAlias = new ArrayList<>();
     }
 
     public int[] getPositions(String id){

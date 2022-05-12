@@ -1,35 +1,28 @@
 //tabby endpoint to sink search
-match (source:Method {NAME:"readObject",IS_SERIALIZABLE:true, CLASSNAME:"javax.management.BadAttributeValueExpException"})
-with collect(source) as sources
+match (source:Method {NAME:"readObject",CLASSNAME:"javax.management.BadAttributeValueExpException"})
 match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.findJavaGadget(sink, sources, 12, null, false, false) yield path where none(n in nodes(path) where n.NAME0 in ["java.util.Map$Entry.getValue","org.apache.commons.collections.bag.AbstractMapBag.toString"])
+with source, collect(sink) as sinks
+call tabby.algo.findJavaGadget(source, sinks, 12, false) yield path where none(n in nodes(path) where n.NAME0 in ["org.apache.commons.collections.functors.PrototypeFactory$PrototypeCloneFactory.create"] or n.CLASSNAME in ["org.apache.commons.collections.BeanMap","org.apache.commons.beanutils.BeanMap","org.apache.commons.collections.bag.AbstractMapBag"])
 return path limit 1
 
 //tabby endpoint to sink search
-match (source:Method {NAME:"readObject",IS_SERIALIZABLE:true, CLASSNAME:"java.util.HashSet"})
-with collect(source) as sources
+match (source:Method {NAME:"readObject",CLASSNAME:"java.util.HashSet"})
 match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.findJavaGadget(sink, sources, 12, null, false, false) yield path where none(n in nodes(path) where n.NAME0 in ["java.util.Map$Entry.getValue"])
+with source, collect(sink) as sinks
+call tabby.algo.findJavaGadget(source, sinks, 12, false) yield path where none(n in nodes(path) where n.NAME0 in ["org.apache.commons.collections.functors.PrototypeFactory$PrototypeCloneFactory.create"] or n.CLASSNAME in ["org.apache.commons.collections.BeanMap","org.apache.commons.beanutils.BeanMap","org.apache.commons.collections.bag.AbstractMapBag"])
 return path limit 1
 
 //tabby endpoint to sink search
-match (source:Method {NAME:"readObject",IS_SERIALIZABLE:true, CLASSNAME:"java.util.Hashtable"})
-with collect(source) as sources
+match (source:Method {NAME:"readObject",CLASSNAME:"java.util.Hashtable"})
 match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.findJavaGadget(sink, sources, 12, null, false, false) yield path where none(n in nodes(path) where n.NAME0 in ["java.util.Map$Entry.getValue"])
-return path limit 1
-
-//cc8变种 XString.equals to toString
-match (source:Method {NAME:"readObject",IS_SERIALIZABLE:true, CLASSNAME:"java.util.Hashtable"})
-with collect(source) as sources
-match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.findJavaGadget(sink, sources, 12, null, false, false) yield path where none(n in nodes(path) where n.NAME0 in ["java.util.Map$Entry.getValue","java.lang.Object.hashCode","javax.management.ImmutableDescriptor.equals","javax.swing.text.html.HTML$UnknownTag.equals"])
+with source, collect(sink) as sinks
+call tabby.algo.findJavaGadget(source, sinks, 12, false) yield path where none(n in nodes(path) where n.NAME0 in ["org.apache.commons.collections.functors.PrototypeFactory$PrototypeCloneFactory.create","java.security.Provider.readObject"] or n.CLASSNAME in ["org.apache.commons.collections.BeanMap","org.apache.commons.beanutils.BeanMap","org.apache.commons.collections.bag.AbstractMapBag"])
 return path limit 1
 
 
-//tabby endpoint to sink search
-match (source:Method {NAME:"readObject",IS_SERIALIZABLE:true, CLASSNAME:"java.util.Hashtable"})
-with collect(source) as sources
+// cb1
+match (source:Method {NAME:"compare", CLASSNAME:"org.apache.commons.beanutils.BeanComparator"})
 match (sink:Method {IS_SINK:true, NAME:"invoke"})
-call tabby.algo.findJavaGadget(sink, sources, 12, null, false, false) yield path where none(n in nodes(path) where n.NAME0 in ["java.util.Map$Entry.getValue"])
+with source, collect(sink) as sinks
+call tabby.algo.findVul(source, sinks, 8, false) yield path
 return path limit 1
