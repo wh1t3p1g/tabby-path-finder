@@ -59,6 +59,7 @@ public class BackwardCalculator implements Calculator{
                 if(PositionHelper.isNotPollutedPosition(call)) return null;
                 newPolluted.addAll(Arrays.stream(call).boxed().collect(Collectors.toSet()));
             }else if(p == PositionHelper.SOURCE){
+                // 如果仅剩下-2，则后续的节点只需判断是否是source节点即可
                 newPolluted.add(PositionHelper.SOURCE);
             } else{
                 return null;

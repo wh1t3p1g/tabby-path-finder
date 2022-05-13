@@ -1,0 +1,6 @@
+// c3p0
+match (source:Method {NAME:"readObject"})
+match (sink:Method {IS_SINK:true, VUL:"JNDI"})
+with source, collect(sink) as sinks
+call tabby.algo.findJavaGadget(source, sinks, 8, false) yield path
+return path limit 1

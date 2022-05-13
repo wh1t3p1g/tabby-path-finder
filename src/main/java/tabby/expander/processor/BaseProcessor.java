@@ -33,7 +33,7 @@ public abstract class BaseProcessor implements Processor{
 
         int[] polluted = null;
         if(lastRelationship == null){
-            polluted = preState.getPositions("initial");
+            polluted = preState.getInitialPositions(node.getId());
         }else{
             long id = lastRelationship.getId();
             polluted = preState.getPositions(id + "");

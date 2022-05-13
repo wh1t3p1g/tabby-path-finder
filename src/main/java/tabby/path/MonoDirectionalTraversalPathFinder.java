@@ -13,6 +13,7 @@ import tabby.evaluator.MultiMonoPathEvaluator;
 import tabby.evaluator.judgment.Judgment;
 import tabby.util.JsonHelper;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,78 +22,59 @@ import java.util.List;
  */
 public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
 
-    private int[] initialPositions;
     private InitialBranchState.State<State> stack;
     private Judgment judgment;
 
     public MonoDirectionalTraversalPathFinder(EvaluationContext context,
                                               PathExpander<State> expander,
                                               int maxDepth,
-                                              String state,
+                                              State state,
                                               boolean depthFirst,
                                               Judgment judgment
     ) {
         super(context, expander, maxDepth, depthFirst);
-
         this.judgment = judgment;
-        if(state != null){
-            init(state);
-        }
-    }
-
-    public MonoDirectionalTraversalPathFinder(EvaluationContext context,
-                                              PathExpander<State> expander,
-                                              int maxDepth,
-                                              int[] initialPositions,
-                                              boolean depthFirst,
-                                              Judgment judgment
-    ) {
-        super(context, expander, maxDepth, depthFirst);
-
-        this.judgment = judgment;
-        this.initialPositions = initialPositions;
-        this.stack = new InitialBranchState.State<>(
-                State.newInstance(initialPositions),
-                State.newInstance(initialPositions));
+        this.stack = new InitialBranchState.State<>(state, state.copy());
     }
 
     @Override
     protected Traverser instantiateTraverser(Node start, Node end) {
         Transaction transaction = context.transaction();
 
-        if(initialPositions == null){
-            String position = (String) start.getProperty("POLLUTED_POSITION", "[]");
-            init(position);
-        }
-        TraversalDescription base = transaction.traversalDescription();
-        if(depthFirst){
-            base = base.depthFirst();
-        }else{
-            base = base.breadthFirst();
-        }
+        TraversalDescription base = getBaseDescription(transaction, Collections.singletonList(start));
+
         return base.expand(expander, stack)
                 .evaluator(MonoPathEvaluator.of(end, maxDepth))
                 .uniqueness(uniqueness())
                 .traverse(start);
     }
 
-    public void init(String pp){
-        if(initialPositions == null){
-            initialPositions = JsonHelper.parsePollutedPosition(pp);
-            stack = new InitialBranchState.State<>(
-                    State.newInstance(initialPositions),
-                    State.newInstance(initialPositions));
-        }
-    }
-
     @Override
     protected Traverser instantiateTraverser(Node start, List<Node> ends) {
         Transaction transaction = context.transaction();
 
-        if(initialPositions == null){
-            String position = (String) start.getProperty("POLLUTED_POSITION", "[]");
-            init(position);
-        }
+        TraversalDescription base = getBaseDescription(transaction, Collections.singletonList(start));
+
+        return base.expand(expander, stack)
+                .evaluator(MultiMonoPathEvaluator.of(ends, maxDepth, judgment))
+                .uniqueness(uniqueness())
+                .traverse(start);
+    }
+
+    @Override
+    protected Traverser instantiateTraverser(List<Node> starts, List<Node> ends) {
+        Transaction transaction = context.transaction();
+
+        TraversalDescription base = getBaseDescription(transaction, starts);
+
+        return base.expand(expander, stack)
+                .evaluator(MultiMonoPathEvaluator.of(ends, maxDepth, judgment))
+                .uniqueness(uniqueness())
+                .traverse(starts);
+    }
+
+    public TraversalDescription getBaseDescription(Transaction transaction, List<Node> starts){
+        initialStack(starts);
 
         TraversalDescription base = transaction.traversalDescription();
         if(depthFirst){
@@ -101,9 +83,18 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
             base = base.breadthFirst();
         }
 
-        return base.expand(expander, stack)
-                .evaluator(MultiMonoPathEvaluator.of(ends, maxDepth, judgment))
-                .uniqueness(uniqueness())
-                .traverse(start);
+        return base;
+    }
+
+    public void initialStack(List<Node> starts){
+        if(stack == null){
+            State state = State.newInstance();
+            for(Node start:starts){
+                String position = (String) start.getProperty("POLLUTED_POSITION", "[]");
+                int[] initialPositions = JsonHelper.parsePollutedPosition(position);
+                state.addInitialPositions(start.getId(), initialPositions);
+            }
+            stack = new InitialBranchState.State<>(state, state.copy());
+        }
     }
 }

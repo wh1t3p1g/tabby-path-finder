@@ -49,7 +49,7 @@ public class BackwardPathExpander implements PathExpander<State> {
         int[] current = null;
         boolean isLastRelationshipTypeAlias = false;
         if(lastRelationship == null){
-            current = preState.getPositions("initial");
+            current = preState.getInitialPositions(node.getId());
         }else{
             String id = lastRelationship.getId() + "";
             current = preState.getPositions(id);

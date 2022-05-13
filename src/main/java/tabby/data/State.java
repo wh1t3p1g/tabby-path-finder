@@ -25,6 +25,14 @@ public class State {
         this.nextAlias = new ArrayList<>();
     }
 
+    public int[] getInitialPositions(long nodeId){
+        return getPositions("node_"+nodeId);
+    }
+
+    public void addInitialPositions(long nodeId, int[] positions){
+        this.positions.put("node_"+nodeId, positions);
+    }
+
     public int[] getPositions(String id){
         return positions.get(id);
     }
@@ -57,9 +65,12 @@ public class State {
         return new State();
     }
 
-    public static State newInstance(int[] positions){
+    public State copy(){
         State state = new State();
-        state.put("initial", positions);
+        state.setAlias(new ArrayList<>(alias));
+        state.setNextAlias(new ArrayList<>(nextAlias));
+        state.setStaticCalls(new ArrayList<>(staticCalls));
+        state.setPositions(new HashMap<>(positions));
         return state;
     }
 }
