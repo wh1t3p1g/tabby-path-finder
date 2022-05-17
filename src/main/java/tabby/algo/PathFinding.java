@@ -20,6 +20,7 @@ import tabby.util.JsonHelper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -58,19 +59,18 @@ public class PathFinding {
     }
 
     @Procedure
-    @Description("tabby.algo.allSimplePaths(sinks, sources, maxNodes, state, depthFirst) YIELD path, " +
+    @Description("tabby.algo.allSimplePaths(sinks, sources, maxNodes, depthFirst) YIELD path, " +
             "weight - run allSimplePaths with maxNodes and state")
     public Stream<PathResult> allSimplePaths(
             @Name("sinkNodes") List<Node> startNodes,
             @Name("sourceNodes") List<Node> endNodes,
             @Name("maxNodes") long maxNodes,
-            @Name("state") String state,
             @Name("depthFirst") boolean depthFirst) {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
                 new BackwardPathExpander(false),
-                (int) maxNodes, getInitialState(startNodes, state),
+                (int) maxNodes, getInitialState(startNodes, null),
                 depthFirst, new CommonJudgment()
         );
 
@@ -180,9 +180,22 @@ public class PathFinding {
 
     public State getInitialState(List<Node> nodes, String polluted){
         State state = State.newInstance();
-        int[] initialPositions = JsonHelper.parsePollutedPosition(polluted);
+        int[] initialPositions = null;
+        if(polluted != null){
+            initialPositions = JsonHelper.parsePollutedPosition(polluted);
+        }
+
         for(Node node:nodes){
-            state.addInitialPositions(node.getId(), initialPositions);
+            if(initialPositions == null){
+                Map<String, Object> properties = node.getProperties("IS_SINK", "POLLUTED_POSITION");
+                boolean isSink = (boolean) properties.getOrDefault("IS_SINK", false);
+                if(isSink){
+                    polluted = (String) properties.getOrDefault("POLLUTED_POSITION", "[]");
+                    state.addInitialPositions(node.getId(), JsonHelper.parsePollutedPosition(polluted));
+                }
+            }else{
+                state.addInitialPositions(node.getId(), initialPositions);
+            }
         }
 
         return state;
