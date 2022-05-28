@@ -41,11 +41,12 @@ public class ForwardedPathExpander implements PathExpander<State> {
     }
 
     public RelationshipType[] getRelationshipTypes(Relationship relationship, State state){
-        if(relationship != null && state.getNextAlias().contains(relationship.getId())){
-            return new RelationshipType[]{
-                    Types.relationshipTypeFor("CALL>"),
-            };
-        }
+        // 判断下一个节点是否允许扩展alias边
+//        if(relationship != null && state.getNextAlias().contains(relationship.getId())){
+//            return new RelationshipType[]{
+//                    Types.relationshipTypeFor("CALL>"),
+//            };
+//        }
         return relationshipTypes;
     }
 

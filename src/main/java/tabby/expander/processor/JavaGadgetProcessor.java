@@ -3,9 +3,8 @@ package tabby.expander.processor;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import tabby.calculator.Calculator;
-import tabby.util.JsonHelper;
-import tabby.util.PositionHelper;
 import tabby.data.State;
+import tabby.util.JsonHelper;
 import tabby.util.Types;
 
 import java.util.Map;
@@ -51,9 +50,9 @@ public class JavaGadgetProcessor extends BaseProcessor{
             if(pollutedStr == null) return ret;
             int[][] callSite = JsonHelper.parse(pollutedStr);
 
-            if(!PositionHelper.isCallerPolluted(callSite, polluted)){ // 如果当前调用边的调用者不可控，则下一次不进行alias操作
-                nextState.getNextAlias().add(next.getId());
-            }
+//            if(!PositionHelper.isCallerPolluted(callSite, polluted)){ // 如果当前调用边的调用者不可控，则下一次不进行alias操作
+//                nextState.getNextAlias().add(next.getId());
+//            }
 
             int[] nextPos = calculator.calculate(callSite, polluted);
             if(nextPos != null && nextPos.length > 0){

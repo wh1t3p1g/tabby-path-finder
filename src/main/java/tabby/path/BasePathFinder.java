@@ -35,8 +35,8 @@ public abstract class BasePathFinder extends TraversalPathFinder {
     {
         // 从边的角度，会非常全，但相应的也会增加分析时间
         // 从node的角度，会丢失相同节点的另一种通路，但是对漏洞挖掘来说可接受？
-//        return Uniqueness.RELATIONSHIP_PATH;
-        return Uniqueness.NODE_PATH;
+        return Uniqueness.RELATIONSHIP_PATH;
+//        return Uniqueness.NODE_PATH;
     }
 
     public Iterable<Path> findAllPaths(Node start, List<Node> ends){
