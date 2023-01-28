@@ -8,6 +8,7 @@ import org.neo4j.procedure.Procedure;
 import tabby.result.HelpResult;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -38,13 +39,18 @@ public class Help {
         }
         String filter = " WHERE name starts with 'tabby.' " +
                 " AND ($name IS NULL  OR toLower(name) CONTAINS toLower($name) " +
-                " OR ($desc IS NOT NULL AND toLower(description) CONTAINS toLower($desc))) " +
-                "RETURN type, name, description, signature ";
+                " OR ($desc IS NOT NULL AND toLower(description) CONTAINS toLower($desc))) ";
 
-        String query = "WITH 'procedure' as type CALL dbms.procedures() yield name, description, signature " + filter +
-                " UNION ALL " +
-                "WITH 'function' as type CALL dbms.functions() yield name, description, signature " + filter;
-        return tx.execute(query, map("name", name, "desc", searchText ? name : null))
-                .stream().map(row -> new HelpResult(row, !extended.contains((String) row.get("name"))));
+        String proceduresQuery = "SHOW PROCEDURES yield name, description, signature " + filter +
+                "RETURN 'procedure' as type, name, description, signature ";
+
+        String functionsQuery = "SHOW FUNCTIONS yield name, description, signature " + filter +
+                "RETURN 'function' as type, name, description, signature ";
+        Map<String,Object> params = map( "name", name, "desc", searchText ? name : null );
+        Stream<Map<String,Object>> proceduresResults = tx.execute( proceduresQuery, params ).stream();
+        Stream<Map<String,Object>> functionsResults = tx.execute( functionsQuery, params ).stream();
+
+        return Stream.of( proceduresResults, functionsResults ).flatMap( results -> results.map(
+                row -> new HelpResult( row, !extended.contains( (String) row.get( "name" ) ) ) ) );
     }
 }

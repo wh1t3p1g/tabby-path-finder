@@ -29,6 +29,21 @@ public class CommonJudgment implements Judgment{
             }
         }else if(endNodes != null && endNodes.contains(node)){
             // 长度没到，但已经找到了endNode，停止进行
+//            Relationship relationship = path.lastRelationship();
+//            int[] position = state.getPositions(relationship.getId() + "");
+//            String pollutedStr = (String) node.getProperty("POLLUTED_POSITION", "[]");
+//            int[] polluted = JsonHelper.gson.fromJson(pollutedStr, int[].class);
+//            if(polluted != null && polluted.length > 0){
+//                Set<Integer> set = Transformer.intArrayToSet(position);
+//                boolean flag = true;
+//                for(int p:polluted){
+//                    if(!set.contains(p)){
+//                        flag = false;
+//                        break;
+//                    }
+//                }
+//                includes = flag;
+//            }
             continues = false;
         } else {
             includes = false;

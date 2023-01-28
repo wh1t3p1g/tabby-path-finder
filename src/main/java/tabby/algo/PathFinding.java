@@ -80,8 +80,8 @@ public class PathFinding {
     }
 
     @Procedure
-    @Description("tabby.algo.findJavaGadget(source, sinks, maxNodes, depthFirst) YIELD path, " +
-            "weight - run findJavaGadget with maxNodes from source to sink")
+    @Description("tabby.algo.findJavaGadget(source, sinks, maxNodes, depthFirst) YIELD path, weight" +
+            " - run findJavaGadget with maxNodes from source to sinks")
     public Stream<PathResult> findJavaGadget(
             @Name("startNode") Node startNode,
             @Name("endNodes") List<Node> endNodes,

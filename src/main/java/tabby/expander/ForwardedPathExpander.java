@@ -31,8 +31,7 @@ public class ForwardedPathExpander implements PathExpander<State> {
         this.processor = processor;
         String[] types = new String[]{"CALL>", "ALIAS>"};
         direction = Types.directionFor(types[0]);
-        relationshipTypes
-                = new RelationshipType[]{
+        relationshipTypes = new RelationshipType[]{
                     Types.relationshipTypeFor(types[0]),
                     Types.relationshipTypeFor(types[1])
                 };
