@@ -72,7 +72,7 @@ public class PathFinding {
      * @return
      */
     @Procedure
-    @Description("tabby.algo.findPath(startNode, endNodes, maxNodeLength, isBackward, isDepthFirst) YIELD path, weight" +
+    @Description("tabby.algo.findPathWithState(startNode, endNodes, maxNodeLength, state, isDepthFirst) YIELD path, weight" +
             " - using findPath to get sink-sources path with maxNodeLength and state")
     public Stream<PathResult> findPathWithState(@Name("startNode") Node startNode,
                                                 @Name("endNodes") List<Node> endNodes,
