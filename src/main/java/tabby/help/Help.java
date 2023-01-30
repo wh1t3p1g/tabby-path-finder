@@ -6,6 +6,7 @@ import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
 import tabby.result.HelpResult;
+import tabby.result.StringResult;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -52,5 +53,12 @@ public class Help {
 
         return Stream.of( proceduresResults, functionsResults ).flatMap( results -> results.map(
                 row -> new HelpResult( row, !extended.contains( (String) row.get( "name" ) ) ) ) );
+    }
+
+    @Procedure("tabby.version")
+    @Description("tabby path finder version")
+    public Stream<StringResult> version() throws Exception {
+        StringResult result = new StringResult("version 1.0, 20230130");
+        return Stream.of(result);
     }
 }
