@@ -11,7 +11,7 @@ import tabby.data.State;
  */
 public interface Processor {
 
-    void init(Node node, State preState, Relationship lastRelationship, Calculator calculator);
+    void init(Node node, State preState, Relationship lastRelationship);
 
     Relationship process(Relationship next);
 
@@ -23,4 +23,8 @@ public interface Processor {
     boolean isNeedProcess();
 
     State getNextState();
+
+    void setCalculator(Calculator calculator);
+
+    boolean isLastRelationshipTypeAlias();
 }

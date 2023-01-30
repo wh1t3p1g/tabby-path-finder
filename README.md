@@ -16,38 +16,44 @@ mvn clean package -DskipTests
 neo4j server需要在配置中添加上以下内容
 ```
 dbms.security.procedures.unrestricted=apoc.*,tabby.*
-dbms.security.procedures.allowlist=apoc.*,gds.*,tabby.*
 ```
 
 ## #2 语法
 
-help
-```
-call tabby.help("all")
-```
-目前，tabby-path-finder支持2种方式的路径查找
-1. 正向查找，from source to sink
-2. 逆向查找，from sink to source
+#### help 
+查看所有 procedure
 
-正向查找
 ```
-tabby.algo.findVul(source, sinks, maxDepth, depthFirst) yield path
-tabby.algo.findJavaGadget(source, sinks, maxDepth, depthFirst) yield path
+call tabby.help("tabby")
 ```
 
-其中findJavaGadget会根据java原生反序列化的规则来查找利用链，但是会有一些bug。推荐用完该函数之后再用findVul排除一下。
+#### findPath、findAllPaths
 
-逆向查找
+```cypher
+tabby.algo.findPath(startNode, endNodes, maxNodeLength, isBackward, isDepthFirst) YIELD path, weight
+tabby.algo.findPathWithState(startNode, endNodes, maxNodeLength, state, isDepthFirst) YIELD path, weight
+tabby.algo.findAllPaths(startNodes, endNodes, maxNodeLength, isBackward, isDepthFirst) YIELD path, weight
 ```
-tabby.algo.allSimplePaths(sink, sources, maxDepth, state, depthFirst) yield path
+findPath 系列可指定前后向分析算法`isBackward`，也可指定路径检索算法（DFS、BFS）`isDepthFirst`
+
+另外，findPathWithState 默认为后向分析算法，`state`参数可用于指定sink函数的污点信息，类似`[0]`
+
+#### findJavaGadget、findAllJavaGadget
+
+```cypher
+tabby.algo.findJavaGadget(source, sinks, maxNodeLength, isBackward, depthFirst) YIELD path, weight
+tabby.algo.findAllJavaGadget(sources, sinks, maxNodeLength, isBackward, depthFirst) YIELD path, weight
 ```
+findJavaGadget 系列主要用于查找 Java 原生反序列化利用链
+
+#### 通用语法
 
 通用的语法，更多的用法参考neo4j cypher语法
 ```
 match (source:Method {NAME:"readObject"}) // 限定source
 match (sink:Method {IS_SINK:true, NAME:"invoke"}) // 限定sink
 with source, collect(sink) as sinks // 聚合sink
-call tabby.algo.findJavaGadget(source, sinks, 8, false) yield path where none(n in nodes(path) where n.CLASSNAME in ["java.io.ObjectInputStream","org.apache.commons.beanutils.BeanMap","org.apache.commons.collections4.functors.PrototypeFactory$PrototypeCloneFactory"])
+call tabby.algo.findJavaGadget(source, sinks, 8, false, false) yield path where none(n in nodes(path) where n.CLASSNAME in ["java.io.ObjectInputStream","org.apache.commons.beanutils.BeanMap","org.apache.commons.collections4.functors.PrototypeFactory$PrototypeCloneFactory"])
 return path limit 1
 ```
 
