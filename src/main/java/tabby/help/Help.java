@@ -59,7 +59,7 @@ public class Help {
     @Procedure("tabby.version")
     @Description("tabby path finder version")
     public Stream<StringResult> version() throws Exception {
-        StringResult result = new StringResult("version 1.0, 20230130");
+        StringResult result = new StringResult("version 1.0, 20230215");
         return Stream.of(result);
     }
 
