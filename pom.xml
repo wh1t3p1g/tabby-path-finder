@@ -37,6 +37,19 @@
             <version>${neo4j.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.neo4j.procedure</groupId>
+            <artifactId>apoc-core</artifactId>
+            <version>5.4.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j.procedure</groupId>
+            <artifactId>apoc-common</artifactId>
+            <version>5.4.1</version>
+            <scope>provided</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>com.google.guava</groupId>

@@ -7,7 +7,6 @@ import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
 import tabby.data.State;
-import tabby.evaluator.judgment.CommonJudgment;
 import tabby.expander.SimplePathExpander;
 import tabby.expander.processor.ProcessorFactory;
 import tabby.path.MonoDirectionalTraversalPathFinder;
@@ -32,7 +31,7 @@ public class PathFinding {
     @Context
     public Transaction tx;
 
-    @Procedure
+    @Procedure("tabby.algo.findPath")
     @Description("tabby.algo.findPath(startNode, endNodes, maxNodeLength, isBackward, isDepthFirst) YIELD path, weight" +
             " - using findPath to get source-sinks path or sink-sources path with maxNodeLength")
     public Stream<PathResult> findPath(@Name("startNode") Node startNode,
@@ -53,7 +52,7 @@ public class PathFinding {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                expander, (int) maxNodeLength, initialState, isDepthFirst, new CommonJudgment()
+                expander, (int) maxNodeLength, initialState, isDepthFirst
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
@@ -71,7 +70,7 @@ public class PathFinding {
      * @param isDepthFirst
      * @return
      */
-    @Procedure
+    @Procedure("tabby.algo.findPathWithState")
     @Description("tabby.algo.findPathWithState(startNode, endNodes, maxNodeLength, state, isDepthFirst) YIELD path, weight" +
             " - using findPath to get sink-sources path with maxNodeLength and state")
     public Stream<PathResult> findPathWithState(@Name("startNode") Node startNode,
@@ -85,7 +84,7 @@ public class PathFinding {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                expander, (int) maxNodeLength, initialState, isDepthFirst, new CommonJudgment()
+                expander, (int) maxNodeLength, initialState, isDepthFirst
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
@@ -93,7 +92,7 @@ public class PathFinding {
                 .map(PathResult::new);
     }
 
-    @Procedure
+    @Procedure("tabby.algo.findAllPaths")
     @Description("tabby.algo.findAllPaths(startNodes, endNodes, maxNodeLength, isBackward, isDepthFirst) YIELD path, weight" +
             " - using findAllPaths to get sources-sinks path or sinks-sources path with maxNodeLength")
     public Stream<PathResult> findAllPaths(@Name("startNodes") List<Node> startNodes,
@@ -114,7 +113,7 @@ public class PathFinding {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                expander, (int) maxNodeLength, initialState, isDepthFirst, new CommonJudgment()
+                expander, (int) maxNodeLength, initialState, isDepthFirst
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNodes, endNodes);
@@ -122,7 +121,7 @@ public class PathFinding {
                 .map(PathResult::new);
     }
 
-    @Procedure
+    @Procedure("tabby.algo.findJavaGadget")
     @Description("tabby.algo.findJavaGadget(source, sinks, maxNodeLength, isBackward, depthFirst) YIELD path, weight" +
             " - using findJavaGadget to get source-sinks-gadget path")
     public Stream<PathResult> findJavaGadget(
@@ -147,8 +146,7 @@ public class PathFinding {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                expander, (int) maxNodeLength, initialState,
-                depthFirst, new CommonJudgment()
+                expander, (int) maxNodeLength, initialState, depthFirst
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNode, endNodes);
@@ -156,7 +154,7 @@ public class PathFinding {
                 .map(PathResult::new);
     }
 
-    @Procedure
+    @Procedure("tabby.algo.findAllJavaGadget")
     @Description("tabby.algo.findAllJavaGadget(sources, sinks, maxNodeLength, isBackward, depthFirst) YIELD path, weight " +
             "- using findAllJavaGadget to get sources-sinks-gadget paths")
     public Stream<PathResult> findAllJavaGadget(
@@ -181,8 +179,7 @@ public class PathFinding {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                expander, (int) maxNodeLength, initialState,
-                depthFirst, new CommonJudgment()
+                expander, (int) maxNodeLength, initialState, depthFirst
         );
 
         Iterable<Path> allPaths = algo.findAllPaths(startNodes, endNodes);

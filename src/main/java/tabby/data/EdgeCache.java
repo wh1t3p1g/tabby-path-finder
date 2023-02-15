@@ -7,6 +7,7 @@ import org.neo4j.graphdb.Relationship;
 import tabby.util.JsonHelper;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author wh1t3p1g
@@ -20,6 +21,7 @@ public class EdgeCache {
     public EdgeCache() {
         caching = CacheBuilder.newBuilder()
                 .maximumSize(30000)
+                .expireAfterAccess(10, TimeUnit.MINUTES)
                 .build(new CacheLoader<>(){
                     @Override
                     public int[][] load(Relationship edge) throws Exception {
@@ -44,5 +46,9 @@ public class EdgeCache {
 
     public void put(Relationship edge, int[][] values){
         caching.put(edge, values);
+    }
+
+    public long size(){
+        return caching.size();
     }
 }

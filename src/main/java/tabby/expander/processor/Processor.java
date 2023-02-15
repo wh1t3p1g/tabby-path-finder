@@ -27,4 +27,6 @@ public interface Processor {
     void setCalculator(Calculator calculator);
 
     boolean isLastRelationshipTypeAlias();
+
+    Processor copy();
 }

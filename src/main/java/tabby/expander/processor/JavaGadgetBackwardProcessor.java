@@ -46,4 +46,9 @@ public class JavaGadgetBackwardProcessor extends JavaGadgetProcessor{
                 isAbstract() || isFromAbstractClass() ||
                 "java.lang.Object".equals(getClassname());
     }
+
+    @Override
+    public Processor copy() {
+        return new JavaGadgetBackwardProcessor();
+    }
 }

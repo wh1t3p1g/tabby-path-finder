@@ -25,6 +25,7 @@ public class SimplePathExpander implements PathExpander<State> {
     private final Direction direction;
     private final RelationshipType[] relationshipTypes;
     private boolean parallel = false;
+    private boolean isBackward = false;
     private Processor processor;
 
     public SimplePathExpander(Processor processor, boolean parallel, boolean isBackward) {
@@ -32,6 +33,7 @@ public class SimplePathExpander implements PathExpander<State> {
 
         this.processor = processor;
         this.parallel = parallel;
+        this.isBackward = isBackward;
 
         if(isBackward){
             types = new String[]{"<CALL", "<ALIAS"};
@@ -68,6 +70,6 @@ public class SimplePathExpander implements PathExpander<State> {
 
     @Override
     public PathExpander<State> reverse() {
-        return null;
+        return new SimplePathExpander(processor.copy(), parallel, !isBackward);
     }
 }

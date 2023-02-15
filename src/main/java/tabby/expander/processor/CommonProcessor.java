@@ -59,4 +59,9 @@ public class CommonProcessor extends BaseProcessor{
     public boolean isNeedProcess() {
         return true;
     }
+
+    @Override
+    public Processor copy() {
+        return new CommonProcessor();
+    }
 }

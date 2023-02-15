@@ -5,6 +5,7 @@ import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
+import tabby.data.EdgeCache;
 import tabby.result.HelpResult;
 import tabby.result.StringResult;
 
@@ -59,6 +60,13 @@ public class Help {
     @Description("tabby path finder version")
     public Stream<StringResult> version() throws Exception {
         StringResult result = new StringResult("version 1.0, 20230130");
+        return Stream.of(result);
+    }
+
+    @Procedure("tabby.cache.count")
+    @Description("tabby path finder version")
+    public Stream<StringResult> count() throws Exception {
+        StringResult result = new StringResult("cache count: "+ EdgeCache.rel.size());
         return Stream.of(result);
     }
 }

@@ -10,7 +10,6 @@ import org.neo4j.graphdb.traversal.Traverser;
 import tabby.data.State;
 import tabby.evaluator.MonoPathEvaluator;
 import tabby.evaluator.MultiMonoPathEvaluator;
-import tabby.evaluator.judgment.Judgment;
 import tabby.util.JsonHelper;
 
 import java.util.Collections;
@@ -23,17 +22,14 @@ import java.util.List;
 public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
 
     private InitialBranchState.State<State> stack;
-    private Judgment judgment;
 
     public MonoDirectionalTraversalPathFinder(EvaluationContext context,
                                               PathExpander<State> expander,
                                               int maxDepth,
                                               State state,
-                                              boolean depthFirst,
-                                              Judgment judgment
+                                              boolean depthFirst
     ) {
         super(context, expander, maxDepth, depthFirst);
-        this.judgment = judgment;
         this.stack = new InitialBranchState.State<>(state, state.copy());
     }
 
@@ -43,10 +39,7 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
 
         TraversalDescription base = getBaseDescription(transaction, Collections.singletonList(start));
 
-        return base.expand(expander, stack)
-                .evaluator(MonoPathEvaluator.of(end, maxDepth))
-                .uniqueness(uniqueness())
-                .traverse(start);
+        return base.expand(expander, stack).evaluator(MonoPathEvaluator.of(end, maxDepth)).traverse(start);
     }
 
     @Override
@@ -55,10 +48,7 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
 
         TraversalDescription base = getBaseDescription(transaction, Collections.singletonList(start));
 
-        return base.expand(expander, stack)
-                .evaluator(MultiMonoPathEvaluator.of(ends, maxDepth, judgment))
-                .uniqueness(uniqueness())
-                .traverse(start);
+        return base.expand(expander, stack).evaluator(MultiMonoPathEvaluator.of(ends, maxDepth)).traverse(start);
     }
 
     @Override
@@ -67,10 +57,7 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
 
         TraversalDescription base = getBaseDescription(transaction, starts);
 
-        return base.expand(expander, stack)
-                .evaluator(MultiMonoPathEvaluator.of(ends, maxDepth, judgment))
-                .uniqueness(uniqueness())
-                .traverse(starts);
+        return base.expand(expander, stack).evaluator(MultiMonoPathEvaluator.of(ends, maxDepth)).traverse(starts);
     }
 
     public TraversalDescription getBaseDescription(Transaction transaction, List<Node> starts){
@@ -83,7 +70,7 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
             base = base.breadthFirst();
         }
 
-        return base;
+        return base.uniqueness(uniqueness());
     }
 
     public void initialStack(List<Node> starts){

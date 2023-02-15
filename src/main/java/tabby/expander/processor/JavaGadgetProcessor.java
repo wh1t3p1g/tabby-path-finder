@@ -68,4 +68,9 @@ public class JavaGadgetProcessor extends BaseProcessor{
 
         return lastRelationship != null && preState.isStaticCall(lastRelationship.getId()); // 如果上层是静态调用，则默认允许下一层可以不符合上面的条件
     }
+
+    @Override
+    public Processor copy() {
+        return new JavaGadgetProcessor();
+    }
 }
