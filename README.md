@@ -46,6 +46,27 @@ tabby.algo.findAllJavaGadget(sources, sinks, maxNodeLength, isBackward, depthFir
 ```
 findJavaGadget 系列主要用于查找 Java 原生反序列化利用链
 
+#### beta procedures
+```cypher
+tabby.beta.findPath(source, direct, sink, maxNodeLength, isDepthFirst) YIELD path, weight
+tabby.beta.findPathWithState(source, direct, sink, sinkState, maxNodeLength, isDepthFirst) YIELD path, weight
+tabby.beta.findJavaGadget(source, direct, sink, maxNodeLength, isDepthFirst) YIELD path, weight
+tabby.beta.findJavaGadgetWithState(source, direct, sink, sinkState, maxNodeLength, isDepthFirst) YIELD path, weight
+```
+为了能更好地利用内存 cache，不采用上述集合查询的方式，经测试比较，比采用集合的方式提效至少5倍
+但当前 procedure 仍在 beta 阶段，欢迎测试使用！
+
+上述的几个 procedure，source 和 sink 节点的位置是固定的，不需要根据检索方向来调整位置。
+
+findPath 系列 direct 有3种：
+- ">": 前向算法，从 source 开始查找至 sink
+- "<": 后向算法，从 sink 开始查找至 source
+- "-": 双向算法，分别从 source 和 sink 开始查找，找到聚合点后输出
+
+findJavaGadget 系列 direct 只支持前向和后向算法
+
+其他参数同之前的用法一致，不再赘述。
+
 #### 通用语法
 
 通用的语法，更多的用法参考neo4j cypher语法
