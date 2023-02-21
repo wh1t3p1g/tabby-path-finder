@@ -24,7 +24,7 @@ public class CommonProcessor extends BaseProcessor{
         Relationship ret = null;
         String nextId = next.getId() + "";
         if(Types.isAlias(next)){
-            if(polluted.contains(PositionHelper.THIS)){
+            if(calculator instanceof BackwardCalculator || polluted.contains(PositionHelper.THIS)){
                 nextState.put(nextId, polluted.stream().mapToInt(Integer::intValue).toArray());
                 nextState.addAliasEdge(next.getId());
                 ret = next;
