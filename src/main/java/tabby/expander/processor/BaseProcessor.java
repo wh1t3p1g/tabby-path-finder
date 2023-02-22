@@ -5,11 +5,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import tabby.calculator.Calculator;
 import tabby.data.State;
-import tabby.util.PositionHelper;
-import tabby.util.Transformer;
 import tabby.util.Types;
-
-import java.util.Set;
 
 /**
  * @author wh1t3p1g
@@ -23,7 +19,7 @@ public abstract class BaseProcessor implements Processor{
     public State nextState = null;
     public Relationship lastRelationship = null;
     public Calculator calculator = null;
-    public Set<Integer> polluted = null;
+    public int[][] polluted = null;
     public boolean isLastRelationshipTypeAlias = false;
     public boolean isFirstNode = false;
 
@@ -34,7 +30,7 @@ public abstract class BaseProcessor implements Processor{
         this.nextState = State.newInstance();
         this.lastRelationship = lastRelationship;
 
-        int[] polluted = null;
+        int[][] polluted = null;
         if(lastRelationship == null){
             polluted = preState.getInitialPositions(node.getId());
             isFirstNode = true;
@@ -45,8 +41,8 @@ public abstract class BaseProcessor implements Processor{
             isFirstNode = false;
         }
 
-        this.polluted = Transformer.intArrayToSet(polluted);
-        this.polluted.add(PositionHelper.SOURCE); // 添加source
+        this.polluted = polluted;
+//        this.polluted.add(PositionHelper.SOURCE); // 添加source
     }
 
     public void setCalculator(Calculator calculator){

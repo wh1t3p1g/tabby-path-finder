@@ -13,7 +13,7 @@ import java.util.*;
 @Setter
 public class State {
 
-    private Map<String, int[]> positions;
+    private Map<String, int[][]> positions;
     private List<Long> alias;
     private List<Long> staticCalls;
     private List<Long> nextAlias; // 是否允许下一个节点进行alias操作
@@ -25,19 +25,24 @@ public class State {
         this.nextAlias = new ArrayList<>();
     }
 
-    public int[] getInitialPositions(long nodeId){
+    public int[][] getInitialPositions(long nodeId){
         return getPositions("node_"+nodeId);
     }
 
     public void addInitialPositions(long nodeId, int[] positions){
-        this.positions.put("node_"+nodeId, positions);
+        int len = positions.length;
+        int[][] pos = new int[len][];
+        for(int i=0;i<len;i++){
+            pos[i] = new int[]{positions[i]};
+        }
+        this.positions.put("node_"+nodeId, pos);
     }
 
-    public int[] getPositions(String id){
+    public int[][] getPositions(String id){
         return positions.get(id);
     }
 
-    public void put(String id, int[] position){
+    public void put(String id, int[][] position){
         positions.put(id, position);
     }
 

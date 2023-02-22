@@ -5,7 +5,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import tabby.data.EdgeCache;
 import tabby.data.State;
-import tabby.util.Transformer;
 import tabby.util.Types;
 
 import java.util.Map;
@@ -41,7 +40,7 @@ public class JavaGadgetProcessor extends BaseProcessor{
         long nextEdgeId = next.getId();
         String key = nextEdgeId + "";
         if(Types.isAlias(next)){
-            nextState.put(key, Transformer.setToIntArray(polluted));
+            nextState.put(key, polluted);
             nextState.addAliasEdge(nextEdgeId);
             if(lastRelationship != null && preState.isStaticCall(lastRelationship.getId())){
                 nextState.addStaticCallEdge(nextEdgeId);
@@ -49,7 +48,7 @@ public class JavaGadgetProcessor extends BaseProcessor{
             ret = next;
         }else{
             int[][] callSite = EdgeCache.rel.get(next);
-            int[] nextPos = calculator.calculate(callSite, polluted);
+            int[][] nextPos = calculator.calculate(callSite, polluted);
 
             if(nextPos != null && nextPos.length > 0){
                 nextState.put(key, nextPos);

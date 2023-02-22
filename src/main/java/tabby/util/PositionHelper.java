@@ -22,18 +22,11 @@ public class PositionHelper {
         return NOT_POLLUTED_POSITION == (int) pos;
     }
 
-    public static boolean isCallerPolluted(int[][] callSite, Set<Integer> polluted){
-        int length = callSite.length;
-        if(length == 0) return false;
-
-        int[] pos = callSite[0];
-        boolean flag = true;
-        for(int p:pos){
-            if(p == NOT_POLLUTED_POSITION || !polluted.contains(p)){
-                flag = false;
-                break;
-            }
+    public static boolean isThisPolluted(int[][] polluted){
+        for(int[] pos:polluted){
+            Set<Integer> set = Transformer.intArrayToSet(pos);
+            if(set.contains(PositionHelper.THIS)) return true;
         }
-        return flag;
+        return false;
     }
 }

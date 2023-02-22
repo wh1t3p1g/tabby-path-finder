@@ -24,8 +24,8 @@ public class CommonProcessor extends BaseProcessor{
         Relationship ret = null;
         String nextId = next.getId() + "";
         if(Types.isAlias(next)){
-            if(calculator instanceof BackwardCalculator || polluted.contains(PositionHelper.THIS)){
-                nextState.put(nextId, polluted.stream().mapToInt(Integer::intValue).toArray());
+            if(calculator instanceof BackwardCalculator || PositionHelper.isThisPolluted(polluted)){
+                nextState.put(nextId, polluted);
                 nextState.addAliasEdge(next.getId());
                 ret = next;
             }
@@ -33,7 +33,7 @@ public class CommonProcessor extends BaseProcessor{
             int[][] callSite = EdgeCache.rel.get(next);
 
             if(isNecessaryProcess(callSite)){
-                int[] nextPos = calculator.calculate(callSite, polluted);
+                int[][] nextPos = calculator.calculate(callSite, polluted);
 
                 if(nextPos != null && nextPos.length > 0){
                     nextState.put(nextId, nextPos);

@@ -3,7 +3,6 @@ package tabby.expander.processor;
 import org.neo4j.graphdb.Relationship;
 import tabby.data.EdgeCache;
 import tabby.util.PositionHelper;
-import tabby.util.Transformer;
 import tabby.util.Types;
 
 /**
@@ -19,7 +18,7 @@ public class JavaGadgetBackwardProcessor extends JavaGadgetProcessor{
         String key = nextEdgeId + "";
 
         if(Types.isAlias(next)){
-            nextState.put(key, Transformer.setToIntArray(polluted));
+            nextState.put(key, polluted);
             nextState.addAliasEdge(nextEdgeId);
             ret = next;
         }else{
@@ -30,7 +29,7 @@ public class JavaGadgetBackwardProcessor extends JavaGadgetProcessor{
                 return null;
             }
 
-            int[] nextPos = calculator.calculate(callSite, polluted);
+            int[][] nextPos = calculator.calculate(callSite, polluted);
 
             if(nextPos != null && nextPos.length > 0){
                 nextState.put(key, nextPos);

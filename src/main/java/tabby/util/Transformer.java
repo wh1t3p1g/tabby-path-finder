@@ -17,4 +17,11 @@ public class Transformer {
     public static Set<Integer> intArrayToSet(int[] array){
         return Arrays.stream(array).boxed().collect(Collectors.toSet());
     }
+
+    public static Set<Integer> flat(int[][] array){
+        int[] ret = Arrays.stream(array).flatMapToInt(o -> Arrays.stream(o)).toArray();
+        return intArrayToSet(ret);
+    }
+
+
 }
