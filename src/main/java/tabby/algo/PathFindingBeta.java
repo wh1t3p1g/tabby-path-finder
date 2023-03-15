@@ -14,6 +14,7 @@ import tabby.path.BidirectionalTraversalPathFinder;
 import tabby.path.MonoDirectionalTraversalPathFinder;
 import tabby.result.PathResult;
 import tabby.util.JsonHelper;
+import tabby.util.PositionHelper;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -162,10 +163,10 @@ public class PathFindingBeta {
     public State getSourceInitialState(Node node){
         State state = State.newInstance();
         long parameterSize = (long) node.getProperty("PARAMETER_SIZE", 0);
-        int[] initialPositions = new int[(int) (parameterSize+1)];
-        initialPositions[0] = -1; // check this
+        int[][] initialPositions = new int[(int) (parameterSize+1)][];
+        initialPositions[0] = new int[]{PositionHelper.THIS}; // check this
         for(int i=0; i<parameterSize;i++){
-            initialPositions[i+1] = i;
+            initialPositions[i+1] = new int[]{i};
         }
         state.addInitialPositions(node.getId(), initialPositions);
 
@@ -180,10 +181,10 @@ public class PathFindingBeta {
      */
     public State getSinkInitialState(Node node, String polluted){
         State state = State.newInstance();
-        int[] initialPositions = null;
+        int[][] initialPositions = null;
 
         if(polluted != null){
-            initialPositions = JsonHelper.parsePollutedPosition(polluted);
+            initialPositions = JsonHelper.parse(polluted);
         }
 
         if(initialPositions == null){
@@ -191,7 +192,7 @@ public class PathFindingBeta {
             boolean isSink = (boolean) properties.getOrDefault("IS_SINK", false);
             if(isSink){
                 polluted = (String) properties.getOrDefault("POLLUTED_POSITION", "[]");
-                state.addInitialPositions(node.getId(), JsonHelper.parsePollutedPosition(polluted));
+                state.addInitialPositions(node.getId(), JsonHelper.parse(polluted));
             }
         }else{
             state.addInitialPositions(node.getId(), initialPositions);

@@ -29,13 +29,8 @@ public class State {
         return getPositions("node_"+nodeId);
     }
 
-    public void addInitialPositions(long nodeId, int[] positions){
-        int len = positions.length;
-        int[][] pos = new int[len][];
-        for(int i=0;i<len;i++){
-            pos[i] = new int[]{positions[i]};
-        }
-        this.positions.put("node_"+nodeId, pos);
+    public void addInitialPositions(long nodeId, int[][] positions){
+        this.positions.put("node_"+nodeId, positions);
     }
 
     public int[][] getPositions(String id){

@@ -78,7 +78,7 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
             State state = State.newInstance();
             for(Node start:starts){
                 String position = (String) start.getProperty("POLLUTED_POSITION", "[]");
-                int[] initialPositions = JsonHelper.parsePollutedPosition(position);
+                int[][] initialPositions = JsonHelper.parse(position);
                 state.addInitialPositions(start.getId(), initialPositions);
             }
             stack = new InitialBranchState.State<>(state, state.copy());
