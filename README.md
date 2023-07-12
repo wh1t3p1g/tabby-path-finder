@@ -1,4 +1,7 @@
 # tabby-path-finder
+
+[English Version](https://github.com/wh1t3p1g/tabby-path-finder/blob/master/README_EN.md)
+
 ## #0 简介
 A neo4j procedure for [tabby](https://github.com/wh1t3p1g/tabby)
 
