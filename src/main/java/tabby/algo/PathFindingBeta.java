@@ -162,8 +162,13 @@ public class PathFindingBeta {
      */
     public State getSourceInitialState(Node node){
         State state = State.newInstance();
-        long parameterSize = (long) node.getProperty("PARAMETER_SIZE", 0);
-        int[][] initialPositions = new int[(int) (parameterSize+1)][];
+        long parameterSize = 0;
+        try{
+            parameterSize = (long) node.getProperty("PARAMETER_SIZE", 0);
+        }catch (Exception ignore){}
+
+        int initSize = (int)parameterSize + 1;
+        int[][] initialPositions = new int[initSize][];
         initialPositions[0] = new int[]{PositionHelper.THIS}; // check this
         for(int i=0; i<parameterSize;i++){
             initialPositions[i+1] = new int[]{i};
