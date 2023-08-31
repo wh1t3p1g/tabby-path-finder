@@ -11,6 +11,8 @@ public class ProcessorFactory {
             return new JavaGadgetProcessor();
         }else if("JavaGadgetBackward".endsWith(name)){
             return new JavaGadgetBackwardProcessor();
+        }else if("Tabby".equals(name)){
+            return new ForwardedProcessor();
         }
         return new CommonProcessor();
     }

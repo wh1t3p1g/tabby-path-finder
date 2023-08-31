@@ -9,15 +9,13 @@ import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
 import tabby.data.State;
 
-import java.util.List;
-
 import static org.neo4j.graphdb.traversal.Evaluators.toDepth;
 
 /**
  * @author wh1t3p1g
  * @since 2022/1/6
  */
-public class BidirectionalTraversalPathFinder extends BasePathFinder{
+public class BidirectionalTraversalPathFinder extends BasePathFinder<State>{
 
     private InitialBranchState.State<State> sourceState;
     private InitialBranchState.State<State> sinkState;
@@ -31,16 +29,6 @@ public class BidirectionalTraversalPathFinder extends BasePathFinder{
         super(context, expander, maxDepth, depthFirst);
         this.sourceState = new InitialBranchState.State<>(sourceState, sourceState.copy());
         this.sinkState = new InitialBranchState.State<>(sinkState, sinkState.copy());
-    }
-
-    @Override
-    protected Traverser instantiateTraverser(Node start, List<Node> ends) {
-        return null;
-    }
-
-    @Override
-    protected Traverser instantiateTraverser(List<Node> starts, List<Node> ends) {
-        return null;
     }
 
     @Override

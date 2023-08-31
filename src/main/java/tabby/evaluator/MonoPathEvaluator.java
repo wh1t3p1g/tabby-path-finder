@@ -16,10 +16,12 @@ public class MonoPathEvaluator extends PathEvaluator.Adapter<State> {
 
     private Node endNode;
     private int maxDepth;
+    private boolean checkAuth;
 
-    public MonoPathEvaluator(Node endNode, int maxDepth) {
+    public MonoPathEvaluator(Node endNode, int maxDepth, boolean checkAuth) {
         this.endNode = endNode;
         this.maxDepth = maxDepth;
+        this.checkAuth = checkAuth;
     }
 
     @Override
@@ -47,6 +49,10 @@ public class MonoPathEvaluator extends PathEvaluator.Adapter<State> {
     }
 
     public static MonoPathEvaluator of(Node endNode, int maxDepth){
-        return new MonoPathEvaluator(endNode, maxDepth);
+        return new MonoPathEvaluator(endNode, maxDepth, false);
+    }
+
+    public static MonoPathEvaluator of(Node endNode, int maxDepth, boolean checkAuth){
+        return new MonoPathEvaluator(endNode, maxDepth, checkAuth);
     }
 }

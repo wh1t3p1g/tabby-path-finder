@@ -9,7 +9,6 @@ import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
 import tabby.data.State;
 import tabby.evaluator.MonoPathEvaluator;
-import tabby.evaluator.MultiMonoPathEvaluator;
 import tabby.util.JsonHelper;
 
 import java.util.Collections;
@@ -19,7 +18,7 @@ import java.util.List;
  * @author wh1t3p1g
  * @since 2022/4/26
  */
-public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
+public class MonoDirectionalTraversalPathFinder extends BasePathFinder<State>{
 
     private InitialBranchState.State<State> stack;
 
@@ -40,24 +39,6 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder{
         TraversalDescription base = getBaseDescription(transaction, Collections.singletonList(start));
 
         return base.expand(expander, stack).evaluator(MonoPathEvaluator.of(end, maxDepth)).traverse(start);
-    }
-
-    @Override
-    protected Traverser instantiateTraverser(Node start, List<Node> ends) {
-        Transaction transaction = context.transaction();
-
-        TraversalDescription base = getBaseDescription(transaction, Collections.singletonList(start));
-
-        return base.expand(expander, stack).evaluator(MultiMonoPathEvaluator.of(ends, maxDepth)).traverse(start);
-    }
-
-    @Override
-    protected Traverser instantiateTraverser(List<Node> starts, List<Node> ends) {
-        Transaction transaction = context.transaction();
-
-        TraversalDescription base = getBaseDescription(transaction, starts);
-
-        return base.expand(expander, stack).evaluator(MultiMonoPathEvaluator.of(ends, maxDepth)).traverse(starts);
     }
 
     public TraversalDescription getBaseDescription(Transaction transaction, List<Node> starts){

@@ -12,7 +12,7 @@ import tabby.util.Types;
  * @since 2022/5/10
  */
 @Getter
-public abstract class BaseProcessor implements Processor{
+public abstract class BaseProcessor implements Processor<State>{
 
     public Node node = null;
     public State preState = null;
@@ -62,5 +62,10 @@ public abstract class BaseProcessor implements Processor{
     @Override
     public State getNextState() {
         return nextState;
+    }
+
+    @Override
+    public Processor<State> reverse() {
+        return null;
     }
 }

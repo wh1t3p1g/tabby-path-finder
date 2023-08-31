@@ -2,6 +2,8 @@ package tabby.util;
 
 import com.google.gson.Gson;
 
+import java.lang.reflect.Type;
+
 /**
  * @author wh1t3p1g
  * @since 2022/1/6
@@ -30,5 +32,24 @@ public class JsonHelper {
             }
             return ret;
         }
+    }
+
+    public static <T> T parseObject(String polluted, Type type){
+        if(polluted == null || polluted.isBlank()) return null;
+
+        try{
+            return gson.fromJson(polluted, type);
+        }catch (Exception e){
+        }
+        return null;
+    }
+
+    public static <T> T deepCopy(Object obj, Type type){
+        try{
+            String json = gson.toJson(obj);
+            return gson.fromJson(json, type);
+        }catch (Exception e){
+        }
+        return null;
     }
 }

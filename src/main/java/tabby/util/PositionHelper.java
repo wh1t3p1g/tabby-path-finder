@@ -8,10 +8,12 @@ import java.util.Set;
  */
 public class PositionHelper {
 
-    public static int THIS = -1;
-    public static int SOURCE = -2;
-    public static int NOT_POLLUTED_POSITION = -3;
-    public static int ANY = -4;
+    public final static int THIS = -1;
+    public final static int SOURCE = -2;
+    public final static int NOT_POLLUTED_POSITION = -3;
+    public final static int DAO = -4;
+    public final static int RPC = -5;
+    public final static int AUTH = -6;
 
     public static boolean isNotPollutedPosition(Object pos){
         if(pos instanceof int[]){

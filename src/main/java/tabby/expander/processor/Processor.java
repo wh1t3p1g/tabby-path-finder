@@ -3,15 +3,14 @@ package tabby.expander.processor;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import tabby.calculator.Calculator;
-import tabby.data.State;
 
 /**
  * @author wh1t3p1g
  * @since 2022/5/7
  */
-public interface Processor {
+public interface Processor<STATE> {
 
-    void init(Node node, State preState, Relationship lastRelationship);
+    void init(Node node, STATE preState, Relationship lastRelationship);
 
     Relationship process(Relationship next);
 
@@ -22,11 +21,13 @@ public interface Processor {
      */
     boolean isNeedProcess();
 
-    State getNextState();
+    STATE getNextState();
 
     void setCalculator(Calculator calculator);
 
     boolean isLastRelationshipTypeAlias();
 
-    Processor copy();
+    Processor<STATE> copy();
+
+    Processor<STATE> reverse();
 }

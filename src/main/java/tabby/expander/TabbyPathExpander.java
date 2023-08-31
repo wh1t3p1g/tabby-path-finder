@@ -3,9 +3,9 @@ package tabby.expander;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.traversal.BranchState;
 import org.neo4j.internal.helpers.collection.Iterables;
-import tabby.calculator.BackwardCalculator;
-import tabby.calculator.ForwardedCalculator;
-import tabby.data.State;
+import tabby.data.TabbyState;
+import tabby.expander.processor.BackwardedProcessor;
+import tabby.expander.processor.ForwardedProcessor;
 import tabby.expander.processor.Processor;
 import tabby.util.Types;
 
@@ -20,28 +20,28 @@ import java.util.stream.StreamSupport;
  * @author wh1t3p1g
  * @since 2022/4/26
  */
-public class SimplePathExpander implements PathExpander<State> {
+public class TabbyPathExpander implements PathExpander<TabbyState> {
 
     private final Direction direction;
     private final RelationshipType[] relationshipTypes;
     private boolean parallel = false;
     private boolean isBackward = false;
-    private Processor<State> processor;
+    private Processor<TabbyState> processor;
 
-    public SimplePathExpander(Processor<State> processor, boolean parallel, boolean isBackward) {
+    public TabbyPathExpander(boolean parallel, boolean isBackward) {
         String[] types;
 
-        this.processor = processor;
         this.parallel = parallel;
         this.isBackward = isBackward;
 
         if(isBackward){
+            this.processor = new BackwardedProcessor();
             types = new String[]{"<CALL", "<ALIAS"};
-            this.processor.setCalculator(new BackwardCalculator());
         }else{
+            this.processor = new ForwardedProcessor();
             types = new String[]{"CALL>", "ALIAS>"};
-            this.processor.setCalculator(new ForwardedCalculator());
         }
+
         direction = Types.directionFor(types[0]);
         relationshipTypes = new RelationshipType[]{
                     Types.relationshipTypeFor(types[0]),
@@ -50,7 +50,7 @@ public class SimplePathExpander implements PathExpander<State> {
     }
 
     @Override
-    public ResourceIterable<Relationship> expand(Path path, BranchState<State> state) {
+    public ResourceIterable<Relationship> expand(Path path, BranchState<TabbyState> state) {
         final Node node = path.endNode();
         final Relationship lastRelationship = path.lastRelationship();
         processor.init(node, state.getState(), lastRelationship);
@@ -69,7 +69,7 @@ public class SimplePathExpander implements PathExpander<State> {
     }
 
     @Override
-    public PathExpander<State> reverse() {
-        return new SimplePathExpander(processor.copy(), parallel, !isBackward);
+    public PathExpander<TabbyState> reverse() {
+        return new TabbyPathExpander(parallel, !isBackward);
     }
 }
