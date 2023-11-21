@@ -1,4 +1,4 @@
-package tabby.algo;
+package tabby.algo.release;
 
 import org.neo4j.graphalgo.BasicEvaluationContext;
 import org.neo4j.graphdb.*;

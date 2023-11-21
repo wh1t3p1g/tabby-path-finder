@@ -1,4 +1,4 @@
-package tabby.algo;
+package tabby.algo.beta;
 
 import org.neo4j.graphalgo.BasicEvaluationContext;
 import org.neo4j.graphalgo.impl.path.TraversalPathFinder;
@@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
  * @author wh1t3p1g
  * @since 2022/1/6
  */
-public class NewPathFinding {
+public class PathFinding {
 
     @Context
     public GraphDatabaseService db;
@@ -62,7 +62,7 @@ public class NewPathFinding {
     }
 
     @Procedure("tabby.beta.findPathWithAuth")
-    @Description("tabby.beta.findPath(source, sink, maxNodeLength, isDepthFirst) YIELD path, weight" +
+    @Description("tabby.beta.findPathWithAuth(source, sink, maxNodeLength, isDepthFirst) YIELD path, weight" +
             " - using findPath to get source-sink path with maxNodeLength")
     public Stream<PathResult> findPathWithAuth(@Name("source") Node sourceNode,
                                                 @Name("sink") Node sinkNode,

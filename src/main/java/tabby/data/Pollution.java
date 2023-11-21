@@ -52,7 +52,7 @@ public class Pollution {
     }
 
     public Set<String> getTypes(int index){
-        if(types.size() < index) return new HashSet<>();
+        if(types.size() <= index) return new HashSet<>();
         return types.get(index);
     }
 
@@ -99,8 +99,11 @@ public class Pollution {
                         next.add(Set.of(index-1));
                         flag = false;
                     }
-                    int pos = p+1;
-                    if(pos < pre.getTypes().size() && pos >= 0 && !cur.isCallerInstanceObj()){
+                }
+
+                int pos = p+1;
+                if(pos < pre.getTypes().size() && pos >= 0){
+                    if(index != 0 || !cur.isCallerInstanceObj()){
                         newTypes.addAll(pre.getTypes(pos));
                     }
                 }
@@ -224,7 +227,7 @@ public class Pollution {
 
         if(!types.isEmpty()){
             Set<String> baseObjTypes = types.get(0);
-            if(baseObjTypes.size() > 0){
+            if(baseObjTypes.size() > 0 && !baseObjTypes.contains("java.lang.Object")){
                 try{
                     String startNodeClazz = (String) start.getProperty("CLASSNAME");
                     if(startNodeClazz != null && !startNodeClazz.isBlank()){
