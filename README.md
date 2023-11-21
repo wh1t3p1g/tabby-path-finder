@@ -30,45 +30,25 @@ dbms.security.procedures.unrestricted=apoc.*,tabby.*
 call tabby.help("tabby")
 ```
 
-#### findPath、findAllPaths
+#### released procedures
 
 ```cypher
-tabby.algo.findPath(startNode, endNodes, maxNodeLength, isBackward, isDepthFirst) YIELD path, weight
-tabby.algo.findPathWithState(startNode, endNodes, maxNodeLength, state, isDepthFirst) YIELD path, weight
-tabby.algo.findAllPaths(startNodes, endNodes, maxNodeLength, isBackward, isDepthFirst) YIELD path, weight
+tabby.algo.findPath(source, direct, sink, maxNodeLength, isDepthFirst) YIELD path, weight
+tabby.algo.findPathWithState(source, direct, sink, sinkState, maxNodeLength, isDepthFirst) YIELD path, weight
+tabby.algo.findJavaGadget(source, direct, sink, maxNodeLength, isDepthFirst) YIELD path, weight
+tabby.algo.findJavaGadgetWithState(source, direct, sink, sinkState, maxNodeLength, isDepthFirst) YIELD path, weight
 ```
-findPath 系列可指定前后向分析算法`isBackward`，也可指定路径检索算法（DFS、BFS）`isDepthFirst`
 
-另外，findPathWithState 默认为后向分析算法，`state`参数可用于指定sink函数的污点信息，类似`[0]`
+findPath 系列用于应用 tabby 生成的带污点的代码属性图，在遍历过程中不断剪枝，最终输出 n 条符合污点传播的路径。
 
-#### findJavaGadget、findAllJavaGadget
+findJavaGadget 系列用于查找 Java 原生反序列化利用链，在污点剪枝的基础上，同时判断当前函数所属的 class 是否实现了 Serializable 接口。
 
-```cypher
-tabby.algo.findJavaGadget(source, sinks, maxNodeLength, isBackward, depthFirst) YIELD path, weight
-tabby.algo.findAllJavaGadget(sources, sinks, maxNodeLength, isBackward, depthFirst) YIELD path, weight
-```
-findJavaGadget 系列主要用于查找 Java 原生反序列化利用链
-
-#### beta procedures
-```cypher
-tabby.beta.findPath(source, direct, sink, maxNodeLength, isDepthFirst) YIELD path, weight
-tabby.beta.findPathWithState(source, direct, sink, sinkState, maxNodeLength, isDepthFirst) YIELD path, weight
-tabby.beta.findJavaGadget(source, direct, sink, maxNodeLength, isDepthFirst) YIELD path, weight
-tabby.beta.findJavaGadgetWithState(source, direct, sink, sinkState, maxNodeLength, isDepthFirst) YIELD path, weight
-```
-为了能更好地利用内存 cache，不采用上述集合查询的方式，经测试比较，比采用集合的方式提效至少5倍
-但当前 procedure 仍在 beta 阶段，欢迎测试使用！
-
-上述的几个 procedure，source 和 sink 节点的位置是固定的，不需要根据检索方向来调整位置。
-
-findPath 系列 direct 有3种：
+另外，findPath 系列 direct 有3种：
 - ">": 前向算法，从 source 开始查找至 sink
 - "<": 后向算法，从 sink 开始查找至 source
 - "-": 双向算法，分别从 source 和 sink 开始查找，找到聚合点后输出
 
 findJavaGadget 系列 direct 只支持前向和后向算法
-
-其他参数同之前的用法一致，不再赘述。
 
 #### 通用语法
 
@@ -76,8 +56,12 @@ findJavaGadget 系列 direct 只支持前向和后向算法
 ```
 match (source:Method {NAME:"readObject"}) // 限定source
 match (sink:Method {IS_SINK:true, NAME:"invoke"}) // 限定sink
-with source, collect(sink) as sinks // 聚合sink
-call tabby.algo.findJavaGadget(source, sinks, 8, false, false) yield path where none(n in nodes(path) where n.CLASSNAME in ["java.io.ObjectInputStream","org.apache.commons.beanutils.BeanMap","org.apache.commons.collections4.functors.PrototypeFactory$PrototypeCloneFactory"])
+call tabby.algo.findJavaGadget(source, ">", sink, 8, false) yield path 
+where none(n in nodes(path) where 
+    n.CLASSNAME in [
+        "java.io.ObjectInputStream",
+        "org.apache.commons.beanutils.BeanMap",
+        "org.apache.commons.collections4.functors.PrototypeFactory$PrototypeCloneFactory"])
 return path limit 1
 ```
 
@@ -96,6 +80,6 @@ Note: tricks:
 
 ## #3 案例
 
-见cyphers目录
+~~见cyphers目录~~
 
 目前，查询结果基于tabby 2.0，暂未测试tabby 1.x
