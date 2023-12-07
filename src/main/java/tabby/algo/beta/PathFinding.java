@@ -1,26 +1,22 @@
 package tabby.algo.beta;
 
-import org.neo4j.graphalgo.BasicEvaluationContext;
-import org.neo4j.graphalgo.impl.path.TraversalPathFinder;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
-import tabby.data.TabbyState;
-import tabby.expander.TabbyPathExpander;
-import tabby.path.TabbyBidirectionalTraversalPathFinder;
-import tabby.path.TabbyTraversalPathFinder;
+import tabby.algo.BasePathFinding;
 import tabby.result.PathResult;
 
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * @author wh1t3p1g
  * @since 2022/1/6
  */
-public class PathFinding {
+public class PathFinding extends BasePathFinding {
 
     @Context
     public GraphDatabaseService db;
@@ -36,7 +32,7 @@ public class PathFinding {
                                        @Name("sink") Node sinkNode,
                                        @Name("maxNodeLength") long maxNodeLength,
                                        @Name("isDepthFirst") boolean isDepthFirst){
-        return findPathWithState(sourceNode, direct, sinkNode, null, maxNodeLength, isDepthFirst, false);
+        return findPathWithState(sourceNode, direct, sinkNode, null, maxNodeLength, isDepthFirst, false, true, db, tx);
     }
 
     /**
@@ -58,7 +54,7 @@ public class PathFinding {
                                                 @Name("state") String state,
                                                 @Name("maxNodeLength") long maxNodeLength,
                                                 @Name("isDepthFirst") boolean isDepthFirst){
-        return findPathWithState(sourceNode, direct, sinkNode, state, maxNodeLength, isDepthFirst, false);
+        return findPathWithState(sourceNode, direct, sinkNode, state, maxNodeLength, isDepthFirst, false, true, db, tx);
     }
 
     @Procedure("tabby.beta.findPathWithAuth")
@@ -69,55 +65,6 @@ public class PathFinding {
                                                 @Name("maxNodeLength") long maxNodeLength,
                                                 @Name("isDepthFirst") boolean isDepthFirst){
 
-        return findPathWithState(sourceNode, ">", sinkNode, null, maxNodeLength, isDepthFirst, true);
+        return findPathWithState(sourceNode, ">", sinkNode, null, maxNodeLength, isDepthFirst, true, true, db, tx);
     }
-
-
-
-    public Stream<PathResult> findPathWithState(Node sourceNode, String direct, Node sinkNode, String state,
-                                               long maxNodeLength, boolean isDepthFirst, boolean checkAuth){
-
-        PathExpander<TabbyState> expander;
-        TraversalPathFinder algo;
-        Iterable<Path> allPaths;
-        int maxDepth = (int) maxNodeLength;
-
-        if(">".equals(direct)){
-            expander = new TabbyPathExpander(false, false);
-            TabbyState initialState = TabbyState.initialState(sourceNode);
-            TabbyState sinkState = TabbyState.initialState(sinkNode, state);
-            algo = new TabbyTraversalPathFinder(
-                    new BasicEvaluationContext(tx, db),
-                    expander, initialState, sinkState,
-                    maxDepth, isDepthFirst, checkAuth, false);
-
-            allPaths = algo.findAllPaths(sourceNode, sinkNode);
-        }else if("<".equals(direct)){
-            expander = new TabbyPathExpander(false, true);
-            TabbyState initialState = TabbyState.initialState(sinkNode, state);
-            if(initialState == null){
-                maxNodeLength = 0;
-            }
-            algo = new TabbyTraversalPathFinder(
-                    new BasicEvaluationContext(tx, db),
-                    expander, initialState, null,
-                    (int) maxNodeLength, isDepthFirst, false, true);
-
-            allPaths = algo.findAllPaths(sinkNode, sourceNode);
-        }else{
-            expander = new TabbyPathExpander(false, false);
-
-            TabbyState sourceState = TabbyState.initialState(sourceNode);
-            TabbyState sinkState = TabbyState.initialState(sinkNode, state);
-
-            algo = new TabbyBidirectionalTraversalPathFinder(new BasicEvaluationContext(tx, db),
-                    expander, sourceState, sinkState, (int) maxNodeLength, isDepthFirst);
-
-            allPaths = algo.findAllPaths(sourceNode, sinkNode);
-        }
-
-        return StreamSupport.stream(allPaths.spliterator(), true)
-                .map(PathResult::new);
-    }
-
 }

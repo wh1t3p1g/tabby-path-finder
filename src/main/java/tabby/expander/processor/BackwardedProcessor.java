@@ -16,6 +16,11 @@ public class BackwardedProcessor implements Processor<TabbyState> {
 
     private TabbyState nextState;
     private Pollution pollution;
+    private boolean isCheckType = false;
+
+    public BackwardedProcessor(boolean isCheckType) {
+        this.isCheckType = isCheckType;
+    }
 
     @Override
     public void init(Node node, TabbyState preState, Relationship lastRelationship) {
@@ -37,7 +42,7 @@ public class BackwardedProcessor implements Processor<TabbyState> {
             nextState.put(nextId, pollution);
             ret = next;
         }else{
-            Pollution callSite = Cache.rel.get(next);
+            Pollution callSite = Cache.rel.get(next, false);
 
             Pollution nextPollution = Pollution.getNextPollutionReverse(pollution, callSite);
             if(nextPollution != null){
@@ -69,11 +74,11 @@ public class BackwardedProcessor implements Processor<TabbyState> {
 
     @Override
     public Processor<TabbyState> copy() {
-        return new BackwardedProcessor();
+        return new BackwardedProcessor(isCheckType);
     }
 
     @Override
     public Processor<TabbyState> reverse() {
-        return new ForwardedProcessor();
+        return new ForwardedProcessor(isCheckType);
     }
 }

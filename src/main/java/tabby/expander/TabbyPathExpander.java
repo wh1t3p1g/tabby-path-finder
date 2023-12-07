@@ -26,19 +26,21 @@ public class TabbyPathExpander implements PathExpander<TabbyState> {
     private final RelationshipType[] relationshipTypes;
     private boolean parallel = false;
     private boolean isBackward = false;
+    private boolean isCheckType = false;
     private Processor<TabbyState> processor;
 
-    public TabbyPathExpander(boolean parallel, boolean isBackward) {
+    public TabbyPathExpander(boolean parallel, boolean isBackward, boolean isCheckType) {
         String[] types;
 
         this.parallel = parallel;
         this.isBackward = isBackward;
+        this.isCheckType = isCheckType;
 
         if(isBackward){
-            this.processor = new BackwardedProcessor();
+            this.processor = new BackwardedProcessor(isCheckType);
             types = new String[]{"<CALL", "<ALIAS"};
         }else{
-            this.processor = new ForwardedProcessor();
+            this.processor = new ForwardedProcessor(isCheckType);
             types = new String[]{"CALL>", "ALIAS>"};
         }
 
@@ -70,6 +72,6 @@ public class TabbyPathExpander implements PathExpander<TabbyState> {
 
     @Override
     public PathExpander<TabbyState> reverse() {
-        return new TabbyPathExpander(parallel, !isBackward);
+        return new TabbyPathExpander(parallel, !isBackward, isCheckType);
     }
 }

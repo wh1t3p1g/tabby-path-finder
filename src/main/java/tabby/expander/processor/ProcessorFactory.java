@@ -12,7 +12,7 @@ public class ProcessorFactory {
         }else if("JavaGadgetBackward".endsWith(name)){
             return new JavaGadgetBackwardProcessor();
         }else if("Tabby".equals(name)){
-            return new ForwardedProcessor();
+            return new ForwardedProcessor(false);
         }
         return new CommonProcessor();
     }

@@ -16,6 +16,11 @@ public class ForwardedProcessor implements Processor<TabbyState> {
 
     private TabbyState nextState;
     private Pollution pollution;
+    private boolean isCheckType = false;
+
+    public ForwardedProcessor(boolean isCheckType) {
+        this.isCheckType = isCheckType;
+    }
 
     @Override
     public void init(Node node, TabbyState preState, Relationship lastRelationship) {
@@ -34,17 +39,22 @@ public class ForwardedProcessor implements Processor<TabbyState> {
         Relationship ret = null;
         String nextId = String.valueOf(next.getId());
         if(Types.isAlias(next)){
-            Node start = next.getStartNode();
-            Node end = next.getEndNode();
-            Pollution nextPollution = Pollution.pure(start, end, pollution);
-            if(nextPollution != null){
-                nextState.put(nextId, nextPollution);
+            if(isCheckType){
+                Node start = next.getStartNode();
+                Node end = next.getEndNode();
+                Pollution nextPollution = Pollution.pure(start, end, pollution);
+                if(nextPollution != null){
+                    nextState.put(nextId, nextPollution);
+                    ret = next;
+                }
+            }else{
+                nextState.put(nextId, pollution);
                 ret = next;
             }
         }else{
-            Pollution callSite = Cache.rel.get(next);
+            Pollution callSite = Cache.rel.get(next, isCheckType);
 
-            Pollution nextPollution = Pollution.getNextPollution(pollution, callSite);
+            Pollution nextPollution = Pollution.getNextPollution(pollution, callSite, isCheckType);
             if(nextPollution != null){
                 nextState.put(nextId, nextPollution);
                 ret = next;
@@ -74,11 +84,11 @@ public class ForwardedProcessor implements Processor<TabbyState> {
 
     @Override
     public Processor<TabbyState> copy() {
-        return new ForwardedProcessor();
+        return new ForwardedProcessor(isCheckType);
     }
 
     @Override
     public Processor<TabbyState> reverse() {
-        return new BackwardedProcessor();
+        return new BackwardedProcessor(isCheckType);
     }
 }

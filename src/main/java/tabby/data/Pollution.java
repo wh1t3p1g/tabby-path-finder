@@ -72,7 +72,7 @@ public class Pollution {
     }
 
     // 正向算法 forward，生成下一个 pollution
-    public static Pollution getNextPollution(Pollution pre, Pollution cur){
+    public static Pollution getNextPollution(Pollution pre, Pollution cur, boolean isCheckType){
         List<Set<Integer>> next = new LinkedList<>();
         List<Set<String>> nextTypes = new LinkedList<>();
         SetMultimap<Integer, Integer> specialPolluted = MultimapBuilder.hashKeys().hashSetValues().build();
@@ -101,10 +101,12 @@ public class Pollution {
                     }
                 }
 
-                int pos = p+1;
-                if(pos < pre.getTypes().size() && pos >= 0){
-                    if(index != 0 || !cur.isCallerInstanceObj()){
-                        newTypes.addAll(pre.getTypes(pos));
+                if(isCheckType){
+                    int pos = p+1;
+                    if(pos < pre.getTypes().size() && pos >= 0){
+                        if(index != 0 || !cur.isCallerInstanceObj()){
+                            newTypes.addAll(pre.getTypes(pos));
+                        }
                     }
                 }
 
@@ -112,7 +114,7 @@ public class Pollution {
                     specialPolluted.putAll(index-1, preSpecialPolluted.get(p));
                 }
             }
-            if(newTypes.size() > 0){
+            if(isCheckType && newTypes.size() > 0){
                 nextTypes.add(newTypes);
             }
         }
@@ -164,12 +166,17 @@ public class Pollution {
         return polluted.isEmpty();
     }
 
-    public static Pollution of(Relationship edge){
+    public static Pollution of(Relationship edge, boolean isCheckType){
         try{
             Pollution pollution = new Pollution();
-            pollution.setPollutedFromJson((String) edge.getProperty("POLLUTED_POSITION", "[]"));
-            pollution.setTypesFromJson((String) edge.getProperty("TYPES", "[]"));
-            pollution.setCallerInstanceObj((boolean) edge.getProperty("IS_CALLER_THIS_FIELD_OBJ", false));
+            if(isCheckType){
+                Map<String, Object> properties = edge.getProperties("POLLUTED_POSITION", "IS_CALLER_THIS_FIELD_OBJ", "TYPES");
+                pollution.setPollutedFromJson((String) properties.getOrDefault("POLLUTED_POSITION", "[]"));
+                pollution.setCallerInstanceObj((boolean) properties.getOrDefault("IS_CALLER_THIS_FIELD_OBJ", false));
+                pollution.setTypesFromJson((String) properties.getOrDefault("TYPES", "[]"));
+            }else{
+                pollution.setPollutedFromJson((String) edge.getProperty("POLLUTED_POSITION", "[]"));
+            }
             return pollution;
         }catch (Exception ig){}
 
