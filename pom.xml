@@ -12,6 +12,8 @@
         <neo4j.version>5.9.0</neo4j.version>
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
 <!--        <neo4j-java-driver.version>4.4.0</neo4j-java-driver.version>-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <dependencies>

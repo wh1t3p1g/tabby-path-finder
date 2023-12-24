@@ -30,7 +30,7 @@ public class PathFinding extends BasePathFinding {
     public Stream<PathResult> findPath(@Name("source") Node sourceNode,
                                        @Name("direct") String direct,
                                        @Name("sink") Node sinkNode,
-                                       @Name("maxNodeLength") long maxNodeLength,
+                                       @Name("maxNodeLength") Number maxNodeLength,
                                        @Name("isDepthFirst") boolean isDepthFirst){
         return findPathWithState(sourceNode, direct, sinkNode, null, maxNodeLength, isDepthFirst, false, false, db, tx);
     }

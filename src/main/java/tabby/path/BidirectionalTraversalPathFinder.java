@@ -22,7 +22,7 @@ public class BidirectionalTraversalPathFinder extends BasePathFinder<State>{
 
     public BidirectionalTraversalPathFinder(EvaluationContext context,
                                             PathExpander<State> expander,
-                                            int maxDepth,
+                                            Number maxDepth,
                                             State sourceState,
                                             State sinkState,
                                             boolean depthFirst) {
@@ -43,8 +43,8 @@ public class BidirectionalTraversalPathFinder extends BasePathFinder<State>{
         }
 
         return transaction.bidirectionalTraversalDescription()
-                .startSide( base.expand( expander, sourceState ).evaluator( toDepth( maxDepth / 2 ) ) )
-                .endSide( base.expand( expander.reverse(), sinkState ).evaluator( toDepth( maxDepth - maxDepth / 2 ) ) )
+                .startSide( base.expand( expander, sourceState ).evaluator( toDepth( (Integer)maxDepth / 2 ) ) )
+                .endSide( base.expand( expander.reverse(), sinkState ).evaluator( toDepth( (Integer)maxDepth - (Integer)maxDepth / 2 ) ) )
                 .traverse( start, end );
     }
 }
