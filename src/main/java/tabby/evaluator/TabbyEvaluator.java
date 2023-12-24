@@ -16,12 +16,12 @@ import tabby.data.TabbyState;
 public class TabbyEvaluator extends PathEvaluator.Adapter<TabbyState>{
 
     private Node endNode;
-    private int maxDepth;
+    private Number maxDepth;
     private boolean checkAuth;
     private boolean isBackward;
     private Pollution endPol = null;
 
-    public TabbyEvaluator(Node endNode, TabbyState endState, int maxDepth, boolean checkAuth, boolean isBackward) {
+    public TabbyEvaluator(Node endNode, TabbyState endState, Number maxDepth, boolean checkAuth, boolean isBackward) {
         this.endNode = endNode;
         this.maxDepth = maxDepth;
         this.checkAuth = checkAuth;
@@ -31,17 +31,17 @@ public class TabbyEvaluator extends PathEvaluator.Adapter<TabbyState>{
         }
     }
 
-    public static TabbyEvaluator of(Node endNode, TabbyState endState, int maxDepth, boolean checkAuth, boolean isBackward){
+    public static TabbyEvaluator of(Node endNode, TabbyState endState, Number maxDepth, boolean checkAuth, boolean isBackward){
         return new TabbyEvaluator(endNode, endState, maxDepth, checkAuth, isBackward);
     }
     @Override
     public Evaluation evaluate(Path path, BranchState<TabbyState> branchState) {
         boolean includes = true;
         boolean continues = true;
-        int length = path.length();
+        Long length = (long) path.length();
         Node node = path.endNode();
 
-        if(length >= maxDepth){
+        if(length >= (Long)maxDepth){
             continues = false; // 超出长度 不继续进行
             if(endNode != null && !endNode.equals(node)){
                 includes = false; // 最后的节点不是endNode，不保存当前结果

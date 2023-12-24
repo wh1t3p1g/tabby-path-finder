@@ -20,13 +20,13 @@ import java.util.stream.StreamSupport;
 public class BasePathFinding {
 
     public static Stream<PathResult> findPathWithState(Node sourceNode, String direct, Node sinkNode, String state,
-                                                       long maxNodeLength, boolean isDepthFirst, boolean checkAuth, boolean isCheckType,
+                                                       Number maxNodeLength, boolean isDepthFirst, boolean checkAuth, boolean isCheckType,
                                                        GraphDatabaseService db, Transaction tx){
 
         PathExpander<TabbyState> expander;
         TraversalPathFinder algo;
         Iterable<Path> allPaths;
-        int maxDepth = (int) maxNodeLength;
+        Number maxDepth = maxNodeLength;
 
         if(">".equals(direct)){
             expander = new TabbyPathExpander(false, false, isCheckType);
@@ -35,19 +35,19 @@ public class BasePathFinding {
             algo = new TabbyTraversalPathFinder(
                     new BasicEvaluationContext(tx, db),
                     expander, initialState, sinkState,
-                    maxDepth, isDepthFirst, checkAuth, false);
+                    maxNodeLength, isDepthFirst, checkAuth, false);
 
             allPaths = algo.findAllPaths(sourceNode, sinkNode);
         }else if("<".equals(direct)){
             expander = new TabbyPathExpander(false, true, isCheckType);
             TabbyState initialState = TabbyState.initialState(sinkNode, state);
             if(initialState == null){
-                maxNodeLength = 0;
+                maxDepth = 0;
             }
             algo = new TabbyTraversalPathFinder(
                     new BasicEvaluationContext(tx, db),
                     expander, initialState, null,
-                    (int) maxNodeLength, isDepthFirst, false, true);
+                    maxDepth, isDepthFirst, false, true);
 
             allPaths = algo.findAllPaths(sinkNode, sourceNode);
         }else{
@@ -57,7 +57,7 @@ public class BasePathFinding {
             TabbyState sinkState = TabbyState.initialState(sinkNode, state);
 
             algo = new TabbyBidirectionalTraversalPathFinder(new BasicEvaluationContext(tx, db),
-                    expander, sourceState, sinkState, (int) maxNodeLength, isDepthFirst);
+                    expander, sourceState, sinkState, maxNodeLength, isDepthFirst);
 
             allPaths = algo.findAllPaths(sourceNode, sinkNode);
         }

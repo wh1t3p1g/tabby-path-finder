@@ -25,7 +25,7 @@ public class TabbyBidirectionalTraversalPathFinder extends BasePathFinder<TabbyS
     public TabbyBidirectionalTraversalPathFinder(EvaluationContext context,
                                                  PathExpander<TabbyState> expander,
                                                  TabbyState sourceState,
-                                                 TabbyState sinkState, int maxDepth,
+                                                 TabbyState sinkState, Number maxDepth,
                                                  boolean depthFirst) {
         super(context, expander, maxDepth, depthFirst);
         this.sourceState = new InitialBranchState.State<>(sourceState, TabbyState.of());
@@ -38,8 +38,8 @@ public class TabbyBidirectionalTraversalPathFinder extends BasePathFinder<TabbyS
         TraversalDescription base = getBaseDescription(transaction);
 
         return transaction.bidirectionalTraversalDescription()
-                .startSide( base.expand( expander, sourceState ).evaluator( toDepth( maxDepth / 2 ) ) )
-                .endSide( base.expand( expander.reverse(), sinkState ).evaluator( toDepth( maxDepth - maxDepth / 2 ) ) )
+                .startSide( base.expand( expander, sourceState ).evaluator( toDepth( (Integer)maxDepth / 2 ) ) )
+                .endSide( base.expand( expander.reverse(), sinkState ).evaluator( toDepth( (Integer)maxDepth - (Integer)maxDepth / 2 ) ) )
                 .collisionEvaluator(Evaluators.all())
                 .collisionPolicy(CollisionDetector::new)
                 .traverse( start, end );

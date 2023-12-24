@@ -13,10 +13,10 @@ public abstract class BasePathFinder<STATE> extends TraversalPathFinder {
 
     public final PathExpander<STATE> expander;
     public final EvaluationContext context;
-    public final int maxDepth;
+    public final Number maxDepth;
     public final boolean depthFirst;
 
-    public BasePathFinder(EvaluationContext context, PathExpander<STATE> expander, int maxDepth, boolean depthFirst) {
+    public BasePathFinder(EvaluationContext context, PathExpander<STATE> expander, Number maxDepth, boolean depthFirst) {
         this.expander = expander;
         this.context = context;
         this.maxDepth = maxDepth;

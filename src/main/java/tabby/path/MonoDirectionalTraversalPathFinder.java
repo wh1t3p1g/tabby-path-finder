@@ -24,7 +24,7 @@ public class MonoDirectionalTraversalPathFinder extends BasePathFinder<State>{
 
     public MonoDirectionalTraversalPathFinder(EvaluationContext context,
                                               PathExpander<State> expander,
-                                              int maxDepth,
+                                              Number maxDepth,
                                               State state,
                                               boolean depthFirst
     ) {

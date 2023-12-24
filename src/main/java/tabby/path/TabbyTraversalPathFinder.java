@@ -24,7 +24,7 @@ public class TabbyTraversalPathFinder extends BasePathFinder<TabbyState> {
     public TabbyTraversalPathFinder(EvaluationContext context,
                                     PathExpander<TabbyState> expander,
                                     TabbyState initialState,
-                                    TabbyState endState, int maxDepth,
+                                    TabbyState endState, Number maxDepth,
                                     boolean depthFirst, boolean checkAuth, boolean isBackward) {
         super(context, expander, maxDepth, depthFirst);
         this.state = new InitialBranchState.State<>(initialState, TabbyState.of());

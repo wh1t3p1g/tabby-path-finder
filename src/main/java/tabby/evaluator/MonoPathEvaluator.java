@@ -15,10 +15,10 @@ import tabby.data.State;
 public class MonoPathEvaluator extends PathEvaluator.Adapter<State> {
 
     private Node endNode;
-    private int maxDepth;
+    private Number maxDepth;
     private boolean checkAuth;
 
-    public MonoPathEvaluator(Node endNode, int maxDepth, boolean checkAuth) {
+    public MonoPathEvaluator(Node endNode, Number maxDepth, boolean checkAuth) {
         this.endNode = endNode;
         this.maxDepth = maxDepth;
         this.checkAuth = checkAuth;
@@ -28,10 +28,10 @@ public class MonoPathEvaluator extends PathEvaluator.Adapter<State> {
     public Evaluation evaluate(Path path, BranchState<State> state) {
         boolean includes = true;
         boolean continues = true;
-        int length = path.length();
+        long length = path.length();
         Node node = path.endNode();
 
-        if(length >= maxDepth){
+        if((Long)length >= (Long)maxDepth){
             continues = false; // 超出长度 不继续进行
             if(endNode != null && !endNode.equals(node)){
                 includes = false; // 最后的节点不是endNode，不保存当前结果
@@ -48,7 +48,7 @@ public class MonoPathEvaluator extends PathEvaluator.Adapter<State> {
         return Evaluation.of(includes, continues);
     }
 
-    public static MonoPathEvaluator of(Node endNode, int maxDepth){
+    public static MonoPathEvaluator of(Node endNode, Number maxDepth){
         return new MonoPathEvaluator(endNode, maxDepth, false);
     }
 
