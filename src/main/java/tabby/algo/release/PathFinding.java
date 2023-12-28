@@ -30,9 +30,9 @@ public class PathFinding extends BasePathFinding {
     public Stream<PathResult> findPath(@Name("source") Node sourceNode,
                                        @Name("direct") String direct,
                                        @Name("sink") Node sinkNode,
-                                       @Name("maxNodeLength") long maxNodeLength,
+                                       @Name("maxNodeLength") Long maxNodeLength,
                                        @Name("isDepthFirst") boolean isDepthFirst){
-        return findPathWithState(sourceNode, direct, sinkNode, null, maxNodeLength, isDepthFirst, false, false, db, tx);
+        return findPathWithState(sourceNode, direct, sinkNode, null, maxNodeLength.intValue(), isDepthFirst, false, false, db, tx);
     }
 
     /**
@@ -52,8 +52,8 @@ public class PathFinding extends BasePathFinding {
                                                 @Name("direct") String direct,
                                                 @Name("sink") Node sinkNode,
                                                 @Name("state") String state,
-                                                @Name("maxNodeLength") long maxNodeLength,
+                                                @Name("maxNodeLength") Long maxNodeLength,
                                                 @Name("isDepthFirst") boolean isDepthFirst){
-        return findPathWithState(sourceNode, direct, sinkNode, state, maxNodeLength, isDepthFirst, false, false, db, tx);
+        return findPathWithState(sourceNode, direct, sinkNode, state, maxNodeLength.intValue(), isDepthFirst, false, false, db, tx);
     }
 }

@@ -37,7 +37,7 @@ public class JavaGadgetPathFinding {
             @Name("source") Node sourceNode,
             @Name("direct") String direct,
             @Name("sink") Node sinkNode,
-            @Name("maxNodeLength") long maxNodeLength,
+            @Name("maxNodeLength") Long maxNodeLength,
             @Name("isDepthFirst") boolean isDepthFirst) {
 
         return findJavaGadgetWithState(sourceNode, direct, sinkNode, null, maxNodeLength, isDepthFirst);
@@ -51,7 +51,7 @@ public class JavaGadgetPathFinding {
             @Name("direct") String direct,
             @Name("sink") Node sinkNode,
             @Name("sinkState") String state,
-            @Name("maxNodeLength") long maxNodeLength,
+            @Name("maxNodeLength") Long maxNodeLength,
             @Name("isDepthFirst") boolean isDepthFirst) {
         boolean isBackward = "<".equals(direct);
         String processor = isBackward ? "JavaGadgetBackward":"JavaGadget";
@@ -69,7 +69,7 @@ public class JavaGadgetPathFinding {
 
         MonoDirectionalTraversalPathFinder algo = new MonoDirectionalTraversalPathFinder(
                 new BasicEvaluationContext(tx, db),
-                expander, (int) maxNodeLength, initialState, isDepthFirst
+                expander, maxNodeLength.intValue(), initialState, isDepthFirst
         );
 
         Iterable<Path> allPaths;

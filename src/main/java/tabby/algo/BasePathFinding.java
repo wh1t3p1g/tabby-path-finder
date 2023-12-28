@@ -20,13 +20,12 @@ import java.util.stream.StreamSupport;
 public class BasePathFinding {
 
     public static Stream<PathResult> findPathWithState(Node sourceNode, String direct, Node sinkNode, String state,
-                                                       long maxNodeLength, boolean isDepthFirst, boolean checkAuth, boolean isCheckType,
+                                                       int maxNodeLength, boolean isDepthFirst, boolean checkAuth, boolean isCheckType,
                                                        GraphDatabaseService db, Transaction tx){
 
         PathExpander<TabbyState> expander;
         TraversalPathFinder algo;
         Iterable<Path> allPaths;
-        int maxDepth = (int) maxNodeLength;
 
         if(">".equals(direct)){
             expander = new TabbyPathExpander(false, false, isCheckType);
@@ -35,7 +34,7 @@ public class BasePathFinding {
             algo = new TabbyTraversalPathFinder(
                     new BasicEvaluationContext(tx, db),
                     expander, initialState, sinkState,
-                    maxDepth, isDepthFirst, checkAuth, false);
+                    maxNodeLength, isDepthFirst, checkAuth, false);
 
             allPaths = algo.findAllPaths(sourceNode, sinkNode);
         }else if("<".equals(direct)){
@@ -47,7 +46,7 @@ public class BasePathFinding {
             algo = new TabbyTraversalPathFinder(
                     new BasicEvaluationContext(tx, db),
                     expander, initialState, null,
-                    (int) maxNodeLength, isDepthFirst, false, true);
+                    maxNodeLength, isDepthFirst, false, true);
 
             allPaths = algo.findAllPaths(sinkNode, sourceNode);
         }else{
@@ -57,7 +56,7 @@ public class BasePathFinding {
             TabbyState sinkState = TabbyState.initialState(sinkNode, state);
 
             algo = new TabbyBidirectionalTraversalPathFinder(new BasicEvaluationContext(tx, db),
-                    expander, sourceState, sinkState, (int) maxNodeLength, isDepthFirst);
+                    expander, sourceState, sinkState, maxNodeLength, isDepthFirst);
 
             allPaths = algo.findAllPaths(sourceNode, sinkNode);
         }

@@ -30,9 +30,9 @@ public class PathFinding extends BasePathFinding {
     public Stream<PathResult> findPath(@Name("source") Node sourceNode,
                                        @Name("direct") String direct,
                                        @Name("sink") Node sinkNode,
-                                       @Name("maxNodeLength") long maxNodeLength,
+                                       @Name("maxNodeLength") Long maxNodeLength,
                                        @Name("isDepthFirst") boolean isDepthFirst){
-        return findPathWithState(sourceNode, direct, sinkNode, null, maxNodeLength, isDepthFirst, false, true, db, tx);
+        return findPathWithState(sourceNode, direct, sinkNode, null, maxNodeLength.intValue(), isDepthFirst, false, true, db, tx);
     }
 
     /**
@@ -52,9 +52,9 @@ public class PathFinding extends BasePathFinding {
                                                 @Name("direct") String direct,
                                                 @Name("sink") Node sinkNode,
                                                 @Name("state") String state,
-                                                @Name("maxNodeLength") long maxNodeLength,
+                                                @Name("maxNodeLength") Long maxNodeLength,
                                                 @Name("isDepthFirst") boolean isDepthFirst){
-        return findPathWithState(sourceNode, direct, sinkNode, state, maxNodeLength, isDepthFirst, false, true, db, tx);
+        return findPathWithState(sourceNode, direct, sinkNode, state, maxNodeLength.intValue(), isDepthFirst, false, true, db, tx);
     }
 
     @Procedure("tabby.beta.findPathWithAuth")
@@ -62,9 +62,9 @@ public class PathFinding extends BasePathFinding {
             " - using findPath to get source-sink path with maxNodeLength")
     public Stream<PathResult> findPathWithAuth(@Name("source") Node sourceNode,
                                                 @Name("sink") Node sinkNode,
-                                                @Name("maxNodeLength") long maxNodeLength,
+                                                @Name("maxNodeLength") Long maxNodeLength,
                                                 @Name("isDepthFirst") boolean isDepthFirst){
 
-        return findPathWithState(sourceNode, ">", sinkNode, null, maxNodeLength, isDepthFirst, true, true, db, tx);
+        return findPathWithState(sourceNode, ">", sinkNode, null, maxNodeLength.intValue(), isDepthFirst, true, true, db, tx);
     }
 }
