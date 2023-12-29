@@ -28,7 +28,7 @@ public class BasePathFinding {
         Iterable<Path> allPaths;
 
         if(">".equals(direct)){
-            expander = new TabbyPathExpander(false, false, isCheckType);
+            expander = new TabbyPathExpander(false, false, isCheckType, db, tx);
             TabbyState initialState = TabbyState.initialState(sourceNode);
             TabbyState sinkState = TabbyState.initialState(sinkNode, state);
             algo = new TabbyTraversalPathFinder(
@@ -38,7 +38,7 @@ public class BasePathFinding {
 
             allPaths = algo.findAllPaths(sourceNode, sinkNode);
         }else if("<".equals(direct)){
-            expander = new TabbyPathExpander(false, true, isCheckType);
+            expander = new TabbyPathExpander(false, true, isCheckType, db, tx);
             TabbyState initialState = TabbyState.initialState(sinkNode, state);
             if(initialState == null){
                 maxNodeLength = 0;
@@ -50,7 +50,7 @@ public class BasePathFinding {
 
             allPaths = algo.findAllPaths(sinkNode, sourceNode);
         }else{
-            expander = new TabbyPathExpander(false, false, isCheckType);
+            expander = new TabbyPathExpander(false, false, isCheckType, db, tx);
 
             TabbyState sourceState = TabbyState.initialState(sourceNode);
             TabbyState sinkState = TabbyState.initialState(sinkNode, state);

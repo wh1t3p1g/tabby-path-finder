@@ -1,7 +1,9 @@
 package tabby.expander.processor;
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import tabby.calculator.Calculator;
 
 /**
@@ -30,4 +32,7 @@ public interface Processor<STATE> {
     Processor<STATE> copy();
 
     Processor<STATE> reverse();
+
+    void setDBSource(GraphDatabaseService db);
+    void setTransaction(Transaction tx);
 }

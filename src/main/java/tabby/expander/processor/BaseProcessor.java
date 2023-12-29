@@ -1,8 +1,10 @@
 package tabby.expander.processor;
 
 import lombok.Getter;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import tabby.calculator.Calculator;
 import tabby.data.State;
 import tabby.util.Types;
@@ -67,5 +69,15 @@ public abstract class BaseProcessor implements Processor<State>{
     @Override
     public Processor<State> reverse() {
         return null;
+    }
+
+    @Override
+    public void setDBSource(GraphDatabaseService db) {
+
+    }
+
+    @Override
+    public void setTransaction(Transaction tx) {
+
     }
 }

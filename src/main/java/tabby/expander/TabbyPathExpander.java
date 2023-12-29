@@ -28,19 +28,25 @@ public class TabbyPathExpander implements PathExpander<TabbyState> {
     private boolean isBackward = false;
     private boolean isCheckType = false;
     private Processor<TabbyState> processor;
+    private GraphDatabaseService db;
+    private Transaction tx;
 
-    public TabbyPathExpander(boolean parallel, boolean isBackward, boolean isCheckType) {
+    public TabbyPathExpander(boolean parallel, boolean isBackward, boolean isCheckType, GraphDatabaseService db, Transaction tx) {
         String[] types;
 
         this.parallel = parallel;
         this.isBackward = isBackward;
         this.isCheckType = isCheckType;
+        this.db = db;
+        this.tx = tx;
 
         if(isBackward){
             this.processor = new BackwardedProcessor(isCheckType);
             types = new String[]{"<CALL", "<ALIAS"};
         }else{
             this.processor = new ForwardedProcessor(isCheckType);
+            this.processor.setDBSource(db);
+            this.processor.setTransaction(tx);
             types = new String[]{"CALL>", "ALIAS>"};
         }
 
@@ -72,6 +78,6 @@ public class TabbyPathExpander implements PathExpander<TabbyState> {
 
     @Override
     public PathExpander<TabbyState> reverse() {
-        return new TabbyPathExpander(parallel, !isBackward, isCheckType);
+        return new TabbyPathExpander(parallel, !isBackward, isCheckType, db, tx);
     }
 }

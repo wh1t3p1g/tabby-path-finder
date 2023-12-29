@@ -1,7 +1,9 @@
 package tabby.expander.processor;
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import tabby.calculator.Calculator;
 import tabby.data.Cache;
 import tabby.data.Pollution;
@@ -80,5 +82,15 @@ public class BackwardedProcessor implements Processor<TabbyState> {
     @Override
     public Processor<TabbyState> reverse() {
         return new ForwardedProcessor(isCheckType);
+    }
+
+    @Override
+    public void setDBSource(GraphDatabaseService db) {
+
+    }
+
+    @Override
+    public void setTransaction(Transaction tx) {
+
     }
 }

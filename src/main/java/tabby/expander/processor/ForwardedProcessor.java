@@ -1,10 +1,12 @@
 package tabby.expander.processor;
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import tabby.calculator.Calculator;
-import tabby.data.Pollution;
 import tabby.data.Cache;
+import tabby.data.Pollution;
 import tabby.data.TabbyState;
 import tabby.util.Types;
 
@@ -17,6 +19,8 @@ public class ForwardedProcessor implements Processor<TabbyState> {
     private TabbyState nextState;
     private Pollution pollution;
     private boolean isCheckType = false;
+    private GraphDatabaseService db;
+    private Transaction tx;
 
     public ForwardedProcessor(boolean isCheckType) {
         this.isCheckType = isCheckType;
@@ -42,7 +46,7 @@ public class ForwardedProcessor implements Processor<TabbyState> {
             if(isCheckType){
                 Node start = next.getStartNode();
                 Node end = next.getEndNode();
-                Pollution nextPollution = Pollution.pure(start, end, pollution);
+                Pollution nextPollution = Pollution.pure(start, end, pollution, db, tx);
                 if(nextPollution != null){
                     nextState.put(nextId, nextPollution);
                     ret = next;
@@ -90,5 +94,15 @@ public class ForwardedProcessor implements Processor<TabbyState> {
     @Override
     public Processor<TabbyState> reverse() {
         return new BackwardedProcessor(isCheckType);
+    }
+
+    @Override
+    public void setDBSource(GraphDatabaseService db) {
+        this.db = db;
+    }
+
+    @Override
+    public void setTransaction(Transaction tx) {
+        this.tx = tx;
     }
 }

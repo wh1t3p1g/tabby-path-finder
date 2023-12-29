@@ -4,8 +4,7 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.reflect.TypeToken;
 import lombok.Data;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 import tabby.util.JsonHelper;
 import tabby.util.PositionHelper;
 
@@ -226,7 +225,7 @@ public class Pollution {
         return true;
     }
 
-    public static Pollution pure(Node start, Node end, Pollution cur){
+    public static Pollution pure(Node start, Node end, Pollution cur, GraphDatabaseService db, Transaction tx){
         Pollution nextPollution = cur.copy();
 
         // pure types
@@ -242,13 +241,30 @@ public class Pollution {
                     }
 
                     if(baseObjTypes.size() > 0){
-                        boolean isAbstract = (boolean) end.getProperty("IS_ABSTRACT", false);
-                        String endNodeClazz = (String) end.getProperty("CLASSNAME");
+                        Map<String, Object> data = end.getProperties("IS_ABSTRACT", "CLASSNAME");
+                        boolean isAbstract = (boolean) data.getOrDefault("IS_ABSTRACT", false);
+                        String endNodeClazz = (String) data.getOrDefault("CLASSNAME", null);
 
                         if(!isAbstract && endNodeClazz != null && !endNodeClazz.isBlank() && !baseObjTypes.contains(endNodeClazz)){
                             // 如果下一个节点还是abstract，则可能下一条边还是alias，继续往下传
                             // 如果下一个节点不是abstract，并且当前types里面没有当前的endNode的类型，则不继续往下传
-                            return null;
+                            try{
+                                Label label = Label.label("Class");
+                                Node classNode = tx.findNode(label, "NAME", endNodeClazz);
+                                if(classNode != null){
+                                    String childClassnames = (String) classNode.getProperty("CHILD_CLASSNAMES", "");
+                                    boolean flag = true;
+                                    for(String objType:baseObjTypes){
+                                        if(childClassnames.contains(objType)){
+                                            flag = false;
+                                            break;
+                                        }
+                                    }
+                                    if(flag) return null;
+                                }
+                            }catch (Exception ignore){
+                                return null;
+                            }
                         }
                     }
                 }catch (Exception ig){}
