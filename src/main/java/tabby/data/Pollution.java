@@ -29,9 +29,17 @@ public class Pollution {
     public void setPollutedFromJson(String json){
         Type objectType = new TypeToken<List<Set<Integer>>>(){}.getType();
         List<Set<Integer>> p = JsonHelper.parseObject(json, objectType);
-        if(p != null){
-            setPolluted(p);
+        if(p == null){
+            // 适配一维数组
+            objectType = new TypeToken<Set<Integer>>(){}.getType();
+            Set<Integer> pp = JsonHelper.parseObject(json, objectType);
+            if(pp != null){
+                p = new ArrayList<>();
+                p.add(pp);
+            }
         }
+
+        setPolluted(p);
     }
 
     public void setTypesFromJson(String json){
